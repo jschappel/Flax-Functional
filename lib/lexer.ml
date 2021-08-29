@@ -14,6 +14,7 @@ type tokenType =
     | FUN
     | IDENTIFIER of string
     | NUMBER of float
+    | STRING of string
 
 type token = Token of tokenType * int
 
@@ -45,6 +46,9 @@ let lex_identifier (txt: char list) : (int * tokenType) =
     | Some(keyword) -> (len, keyword)
     | None -> (len, IDENTIFIER(ident))
 
+let lex_string (txt: char list) : string =
+  String.of_char_list @@ List.take_while txt ~f:(fun c -> c != '"')
+
 let lexProgram prog =
   let rec lexLine txt line =
     match txt with 
@@ -60,6 +64,9 @@ let lexProgram prog =
         | '/' -> Token(SLASH, line) :: lexLine xs line
         | '=' -> Token(EQUAL, line) :: lexLine xs line
         | '\n' -> lexLine xs @@ line + 1
+        | '"' -> let s = lex_string xs in
+                 let xs = List.drop txt @@ (1 + String.length s) in 
+                 Token(STRING(s), line) :: lexLine xs line
         | ' '| '\t' -> lexLine xs line
         | '0'..'9' -> let num_str = lex_number txt line in
                       let xs = List.drop txt @@ String.length num_str in

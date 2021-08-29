@@ -23,12 +23,13 @@ let numbers _ = assert_equal
     Token(NUMBER(100.123), 1)
   ]
 
-(* let strings _ = assert_equal
+let strings _ = assert_equal
   ~printer:token_list_to_string
-  (lexProgram "\"String\"")
+  (lexProgram "\"String\" \"josh\"")
   [
-    Token("String", STRING, 1);
-  ] *)
+    Token(STRING("String"), 1);
+    Token(STRING("josh"), 1);
+  ]
 
 let reserved_identifiers _ = assert_equal
   ~printer:token_list_to_string
@@ -52,6 +53,7 @@ let suite =
   "Tokens" >:::
    ["Operator Tokens" >:: operators;
       "Numbers" >:: numbers;
+      "Strings" >:: strings;
       "Reserved Identifiers" >:: reserved_identifiers;
       "Identifiers" >:: identifiers]
   ;;

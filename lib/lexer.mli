@@ -12,6 +12,7 @@ type tokenType =
     | FUN
     | IDENTIFIER of string
     | NUMBER of float
+    | STRING of string
 
 type token = Token of tokenType * int
 

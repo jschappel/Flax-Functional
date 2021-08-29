@@ -1,6 +1,8 @@
 exe: main.exe
-	dune exe ./program.exe
+	$(dune build bin/program.exe)
+	dune exec bin/program.exe
 	$(echo "")
+
 
 main.exe: install
 

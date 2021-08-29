@@ -13,10 +13,11 @@ let token_list_to_string tokens =
     | Token(LEFT_PAREN, line)     -> fmt line "LEFT_PAREN"
     | Token(RIGHT_PAREN, line)    -> fmt line "RIGHT_PAREN"
     | Token(EQUAL, line)          -> fmt line "EQUAL"
-    | Token(NUMBER(n), line)      -> fmt line "NUMBER " ^ string_of_float n
+    | Token(NUMBER(n), line)      -> fmt line @@ string_of_float n
     | Token(LET, line)            -> fmt line "LET"
     | Token(FUN, line)            -> fmt line "FUN"
     | Token(IN, line)             -> fmt line "IN"
-    | Token(IDENTIFIER(i), line)  -> fmt line "IDENTIFIRE " ^ i
-    | _ -> "Invlid token given" in
+    | Token(IDENTIFIER(i), line)  -> fmt line i
+    | Token(STRING(s), line)      -> fmt line  @@ "\"" ^ s ^ "\""
+    | _ -> "Invalid token given" in
   (List.fold tokens ~init:"" ~f:token_to_string)
