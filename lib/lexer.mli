@@ -7,13 +7,13 @@ type tokenType =
     | STAR 
     | SLASH 
     | DOT
-    | NUMBER
     | LET 
     | IN 
     | FUN
-    | IDENTIFIER
+    | IDENTIFIER of string
+    | NUMBER of float
 
-type token = Token of string * tokenType * int
+type token = Token of tokenType * int
 
 exception LexError of string * int
 
