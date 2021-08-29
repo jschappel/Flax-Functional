@@ -18,9 +18,9 @@ let numbers _ = assert_equal
   ~printer:token_list_to_string
   (lexProgram "1 10 100.123")
   [
-    Token(NUMBER("1"), 1);
-    Token(NUMBER("10"), 1);
-    Token(NUMBER("100.123"), 1)
+    Token(NUMBER(1.0), 1);
+    Token(NUMBER(10.0), 1);
+    Token(NUMBER(100.123), 1)
   ]
 
 (* let strings _ = assert_equal

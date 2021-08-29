@@ -30,7 +30,4 @@ let display = function
   | Token(x, IDENTIFIER, num) -> Printf.sprintf "('%s' IDENTIFIER %d)" x num
   | _ -> "Invlid token given"
 
-let equal t1 t2 =
-  match (t1, t2) with
-  | Token(l, t, n), Token(l2, t2,n2) -> l == l2 && t == t2 && n == n2
-  | _ -> false
+let equal (Token(l, t, n)) (Token(l2, t2, n2)) = l == l2 && t == t2 && n == n2

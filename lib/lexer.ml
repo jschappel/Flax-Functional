@@ -26,23 +26,24 @@ let map = Map.of_alist_exn (module String) [
   ("fun", FUN)]
 
 
-let lex_number (txt: char list) (line: int): float =
+let lex_number (txt: char list) (line: int): string =
   let rec helper txt seen_decimal acc =
     match txt with
-      | [] -> float_of_string acc
+      | [] -> acc
       | x::xs ->
       match x with
         | '0'..'9' -> helper xs seen_decimal @@ acc ^ Char.to_string x 
         | '.' when equal_bool seen_decimal false -> helper xs true @@ acc ^ Char.to_string x
         | '.' -> raise @@ LexError("Invlid number. To many '.'", line)
-        | _ -> if "" == acc then raise @@ LexError("Invlid number.", line) else float_of_string acc
+        | _ -> if "" == acc then raise @@ LexError("Invlid number.", line) else acc
   in helper txt false ""
 
-let lex_identifier txt =
+let lex_identifier (txt: char list) : (int * tokenType) =
   let ident = String.of_char_list @@ List.take_while txt ~f:(fun x -> Char.is_alphanum x) in
+  let len = String.length ident in
   match (Map.find map ident) with
-    | Some(keyword) -> keyword
-    | None -> IDENTIFIER(ident)
+    | Some(keyword) -> (len, keyword)
+    | None -> (len, IDENTIFIER(ident))
 
 let lexProgram prog =
   let rec lexLine txt line =
@@ -60,12 +61,12 @@ let lexProgram prog =
         | '=' -> Token(EQUAL, line) :: lexLine xs line
         | '\n' -> lexLine xs @@ line + 1
         | ' '| '\t' -> lexLine xs line
-        | '0'..'9' -> let num = lex_number txt line in
-                      let xs = List.drop txt @@ String.length num in
-                      Token(NUMBER(num), line) :: lexLine xs line
+        | '0'..'9' -> let num_str = lex_number txt line in
+                      let xs = List.drop txt @@ String.length num_str in
+                      Token(NUMBER(float_of_string num_str), line) :: lexLine xs line
         | 'a'..'z'
-        | 'A'..'Z' -> let tt = lex_identifier txt in
-                      let xs = List.drop txt @@ String.length i in
+        | 'A'..'Z' -> let (len, tt) = lex_identifier txt in
+                      let xs = List.drop txt len in
                       Token(tt, line) :: lexLine xs line
         | _ -> let msg = Printf.sprintf "Invalid token %c" x in
                 raise @@ LexError(msg, line)
