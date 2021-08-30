@@ -1,10 +1,10 @@
-open Base
 open Stdio
+open Lib
+
 (* open Lexer *)
 
-let run_env line = 
-  let open Lexer in
-  Lexer.lexLine line 
+let run_env line =
+  lexProgram line 
 
 
 let loop =

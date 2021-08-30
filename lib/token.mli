@@ -7,14 +7,11 @@ type tokenType =
     | STAR 
     | SLASH 
     | DOT
-    | NUMBER
     | LET 
     | IN 
     | FUN
-    | IDENTIFIER
+    | IDENTIFIER of string
+    | NUMBER of float
+    | STRING of string
 
-type token = Token of string * tokenType * int
-
-val display : token -> string
-
-val equal : token -> token -> bool
+type token = Token of tokenType * int

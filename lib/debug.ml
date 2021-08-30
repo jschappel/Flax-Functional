@@ -1,4 +1,5 @@
 open Lexer
+open Token
 open Core
 
 
