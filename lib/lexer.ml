@@ -48,7 +48,7 @@ let lexProgram prog =
         | '=' -> Token(EQUAL, line) :: lexLine xs line
         | '\n' -> lexLine xs @@ line + 1
         | '"' -> let s = lex_string xs in
-                 let xs = List.drop txt @@ (1 + String.length s) in 
+                 let xs = List.drop txt @@ (2 + String.length s) in 
                  Token(STRING(s), line) :: lexLine xs line
         | ' '| '\t' -> lexLine xs line
         | '0'..'9' -> let num_str = lex_number txt line in
