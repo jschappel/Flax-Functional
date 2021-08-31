@@ -23,6 +23,14 @@ let numbers _ = assert_equal
     Token(NUMBER(100.123), 1)
   ]
 
+let negative_numbers _ = assert_equal
+  ~printer:token_list_to_string
+  (lexProgram "-10 -10.0")
+  [
+    Token(NUMBER(-10.0), 1);
+    Token(NUMBER(-10.0), 1);
+  ]
+
 let strings _ = assert_equal
   ~printer:token_list_to_string
   (lexProgram "\"String\" \"josh\"")
@@ -53,6 +61,7 @@ let suite =
   "Tokens" >:::
    ["Operator Tokens" >:: operators;
       "Numbers" >:: numbers;
+      "Negative Numbers" >:: negative_numbers;
       "Strings" >:: strings;
       "Reserved Identifiers" >:: reserved_identifiers;
       "Identifiers" >:: identifiers]

@@ -31,6 +31,15 @@ let lex_identifier (txt: char list) : (int * tokenType) =
 let lex_string (txt: char list) : string =
   String.of_char_list @@ List.take_while txt ~f:(fun c -> not (Char.equal c '"'))
 
+let lex_minus (txt: char list) (line: int) : (tokenType * int) =
+  match txt with
+    | ('-'::y::xs) when Char.is_digit y -> let num_str = "-" ^ lex_number (y::xs) line in
+                                           (NUMBER(float_of_string num_str), String.length num_str)
+    | ('-'::_) -> (MINUS, 1)
+    | _ -> raise @@ LexError("Unreachable", line)
+
+
+
 let lexProgram prog =
   let rec lexLine txt line =
     match txt with 
@@ -42,7 +51,9 @@ let lexProgram prog =
         | '.' -> Token(DOT, line) :: lexLine xs line
         | '*' -> Token(STAR, line) :: lexLine xs line
         | '+' -> Token(PLUS, line) :: lexLine xs line
-        | '-' -> Token(MINUS, line) :: lexLine xs line
+        | '-' -> let (tt, size) = lex_minus txt line in
+                 let xs = List.drop txt size in
+                 Token(tt, line) :: lexLine xs line
         | '/' -> Token(SLASH, line) :: lexLine xs line
         | '=' -> Token(EQUAL, line) :: lexLine xs line
         | '\n' -> lexLine xs @@ line + 1
