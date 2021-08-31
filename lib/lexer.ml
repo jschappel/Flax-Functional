@@ -9,7 +9,6 @@ let map = Map.of_alist_exn (module String) [
   ("in", IN);
   ("fun", FUN)]
 
-
 let lex_number (txt: char list) (line: int): string =
   let rec helper txt seen_decimal acc =
     match txt with
@@ -19,7 +18,7 @@ let lex_number (txt: char list) (line: int): string =
         | '0'..'9' -> helper xs seen_decimal @@ acc ^ Char.to_string x 
         | '.' when equal_bool seen_decimal false -> helper xs true @@ acc ^ Char.to_string x
         | '.' -> raise @@ LexError("Invlid number. To many '.'", line)
-        | _ -> if "" == acc then raise @@ LexError("Invlid number.", line) else acc
+        | _ -> if String.equal "" acc then raise @@ LexError("Invlid number.", line) else acc
   in helper txt false ""
 
 let lex_identifier (txt: char list) : (int * tokenType) =
@@ -30,7 +29,7 @@ let lex_identifier (txt: char list) : (int * tokenType) =
     | None -> (len, IDENTIFIER(ident))
 
 let lex_string (txt: char list) : string =
-  String.of_char_list @@ List.take_while txt ~f:(fun c -> c != '"')
+  String.of_char_list @@ List.take_while txt ~f:(fun c -> not (Char.equal c '"'))
 
 let lexProgram prog =
   let rec lexLine txt line =
@@ -48,7 +47,7 @@ let lexProgram prog =
         | '=' -> Token(EQUAL, line) :: lexLine xs line
         | '\n' -> lexLine xs @@ line + 1
         | '"' -> let s = lex_string xs in
-                 let xs = List.drop txt @@ (2 + String.length s) in 
+                 let xs = List.drop xs @@ (1 + String.length s) in 
                  Token(STRING(s), line) :: lexLine xs line
         | ' '| '\t' -> lexLine xs line
         | '0'..'9' -> let num_str = lex_number txt line in
