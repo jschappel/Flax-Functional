@@ -1,6 +1,5 @@
-open Lexer
 open Token
-open Core
+open Base
 
 
 let token_list_to_string tokens =
@@ -18,6 +17,9 @@ let token_list_to_string tokens =
     | Token(LET, line)            -> fmt line "LET"
     | Token(FUN, line)            -> fmt line "FUN"
     | Token(IN, line)             -> fmt line "IN"
+    | Token(IF, line)             -> fmt line "IF"
+    | Token(THEN, line)           -> fmt line "THEN"
+    | Token(ELSE, line)           -> fmt line "ELSE"
     | Token(IDENTIFIER(i), line)  -> fmt line i
     | Token(STRING(s), line)      -> fmt line  @@ "\"" ^ s ^ "\""
     | _ -> "Invalid token given" in

@@ -7,7 +7,10 @@ exception LexError of string * int
 let map = Map.of_alist_exn (module String) [
   ("let", LET);
   ("in", IN);
-  ("fun", FUN)]
+  ("fun", FUN);
+  ("if", IF);
+  ("then", THEN);
+  ("else", ELSE)]
 
 let lex_number (txt: char list) (line: int): string =
   let rec helper txt seen_decimal acc =

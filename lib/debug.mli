@@ -1,4 +1,3 @@
-open Lexer
 open Token
 
 (* For debugging Token lists *)

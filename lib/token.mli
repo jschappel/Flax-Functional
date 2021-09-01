@@ -10,6 +10,9 @@ type tokenType =
     | LET 
     | IN 
     | FUN
+    | IF
+    | THEN
+    | ELSE
     | IDENTIFIER of string
     | NUMBER of float
     | STRING of string
