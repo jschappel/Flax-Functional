@@ -1,13 +1,32 @@
-open Lexer
 open Token
 open CoreProgram
-open Base
 
 exception ParseError of string
 
-let parse_expression _tokens = NumExpr(12.0)
+let rec parse_expression exp = 
+  let (p, _) = parse_add_sub_expr exp in p 
+and parse_add_sub_expr tokens =
+  let (exp1, xs) = parse_mult_div_expr tokens in
+  let rec loop (l: token list) (acc: expression) = 
+    match l with
+    | (Token(op, _)::xs) when op = PLUS || op = MINUS -> 
+      let (exp2, xs) = parse_literal_exp xs in                            
+      loop xs (BinaryExpr(op, acc, exp2))
+    | _ -> (acc, l) in
+  loop xs exp1
 
+and parse_mult_div_expr tokens =
+  let (exp1, xs) = parse_literal_exp tokens in
+  let rec loop (l: token list) (acc: expression) = 
+    match l with
+    | (Token(op, _)::xs) when op = SLASH || op = STAR -> 
+      let (exp2, xs) = parse_literal_exp xs in                            
+      loop xs (BinaryExpr(op, acc, exp2))
+    | _ -> (acc, l) in
+  loop xs exp1
 
-let parse_number_exp tokens = function
-| Token(num) -> NumExpr(num)
-| _ -> raise @@ ParseError "Invalid token supplied"
+and parse_literal_exp = function
+| Token(NUMBER(num), _)::xs -> (LiteralExpr(Num(num)), xs)
+| Token(BOOL(b), _)::xs -> (LiteralExpr(Bool(b)), xs)
+| Token(_, line)::_ -> raise @@ ParseError("Invalid Token supplied at line " ^ Int.to_string line)
+| [] -> raise @@ ParseError("Unreachable")

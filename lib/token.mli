@@ -16,5 +16,6 @@ type tokenType =
     | IDENTIFIER of string
     | NUMBER of float
     | STRING of string
+    | BOOL of bool
 
 type token = Token of tokenType * int

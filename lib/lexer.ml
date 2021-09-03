@@ -10,7 +10,10 @@ let map = Map.of_alist_exn (module String) [
   ("fun", FUN);
   ("if", IF);
   ("then", THEN);
-  ("else", ELSE)]
+  ("else", ELSE);
+  ("true", BOOL(true));
+  ("false", BOOL(false));
+  ]
 
 let lex_number (txt: char list) (line: int): string =
   let rec helper txt seen_decimal acc =

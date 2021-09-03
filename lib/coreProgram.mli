@@ -1,6 +1,9 @@
+open Token 
+
+type literal =
+  | Num of float
+  | Bool of bool
+
 type expression =
-    AddExpr of expression * expression
-    | SubExpr of expression * expression
-    | MultExpr of expression * expression
-    | DivExpr of expression * expression
-    | NumExpr of float
+  | BinaryExpr of tokenType * expression * expression
+  | LiteralExpr of literal

@@ -1,5 +1,6 @@
 open OUnit2
 open Lib
+
 let operators _ = assert_equal
   ~printer:token_list_to_string
   (lexProgram "+ - * / ( ) = \t \n +")
