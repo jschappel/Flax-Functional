@@ -10,6 +10,7 @@ type tokenType =
     | LET 
     | IN
     | FUN
+    | NOT
     | AND
     | OR
     | IF

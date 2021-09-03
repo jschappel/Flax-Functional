@@ -40,6 +40,13 @@ let logical_operators _ = assert_equal
     (BinaryExpr(AND, LiteralExpr(Bool(true)), LiteralExpr(Bool(false)))),
     LiteralExpr(Bool(true))))
 
+let unary_expr _ = assert_equal
+~printer:expr_to_string
+  (parse_expression @@ lexProgram "not true and not false")
+  (BinaryExpr(AND,
+    (UnaryExpr(NOT, LiteralExpr(Bool(true)))),
+    UnaryExpr(NOT, LiteralExpr(Bool(false)))))
+
 let suite =
   "AST" >:::
     ["Binary Add" >:: addition;
@@ -47,7 +54,8 @@ let suite =
       "Binary Mult" >:: multiplication;
       "Binary Div" >:: division;
       "Binary Math Ops" >:: mixed_math_operators;
-      "Logical Ops" >:: logical_operators;]
+      "Logical Ops" >:: logical_operators;
+      "Unary Exprs" >:: unary_expr;]
   ;;
   
   let () =

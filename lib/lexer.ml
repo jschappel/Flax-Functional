@@ -14,6 +14,7 @@ let map = Map.of_alist_exn (module String) [
   ("true", BOOL(true));
   ("and", AND);
   ("or", OR);
+  ("not", NOT);
   ("false", BOOL(false));
   ]
 

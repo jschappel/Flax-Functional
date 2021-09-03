@@ -6,4 +6,5 @@ type literal =
 
 type expression =
   | BinaryExpr of tokenType * expression * expression
+  | UnaryExpr of tokenType * expression
   | LiteralExpr of literal

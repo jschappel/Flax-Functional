@@ -42,7 +42,7 @@ let strings _ = assert_equal
 
 let reserved_identifiers _ = assert_equal
   ~printer:token_list_to_string
-  (lexProgram "fun let in if then else and or true false")
+  (lexProgram "fun let in if then else and or true false not")
   [
     Token(FUN, 1);
     Token(LET, 1);
@@ -54,6 +54,7 @@ let reserved_identifiers _ = assert_equal
     Token(OR, 1);
     Token(BOOL(true), 1);
     Token(BOOL(false), 1);
+    Token(NOT, 1);
   ]
 
 let identifiers _ = assert_equal

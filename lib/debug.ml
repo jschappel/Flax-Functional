@@ -20,6 +20,7 @@ let tokenType_to_string = function
 | ELSE          -> "else"
 | AND           -> "and"
 | OR            -> "or"
+| NOT            -> "not"
 | BOOL(b)       -> if b then "true" else "false"
 | NUMBER(n)     -> Float.to_string n
 | STRING(s)     -> "\"" ^ s ^ "\""
@@ -41,4 +42,6 @@ let rec expr_to_string expr =
     | Bool(b) -> Bool.to_string b in 
   match expr with
     | BinaryExpr(op, exp1, exp2) -> "(" ^ (tokenType_to_string op) ^ " " ^ (expr_to_string exp1) ^ " " ^ expr_to_string exp2 ^ ")"
+    | UnaryExpr(op, exp) -> "(" ^ (tokenType_to_string op) ^ " " ^ (expr_to_string exp) ^ ")"
     | LiteralExpr(lit) -> literal_to_string lit
+    
