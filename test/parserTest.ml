@@ -47,6 +47,27 @@ let unary_expr _ = assert_equal
     (UnaryExpr(NOT, LiteralExpr(Bool(true)))),
     UnaryExpr(NOT, LiteralExpr(Bool(false)))))
 
+let equality _ = assert_equal
+~printer:expr_to_string
+(parse_expression @@ lexProgram "1 == 1 and 1 != 3")
+(BinaryExpr(AND,
+  (BinaryExpr(EQ_EQ, LiteralExpr(Num(1.0)), LiteralExpr(Num(1.0)))),
+  (BinaryExpr(NOT_EQ, LiteralExpr(Num(1.0)), LiteralExpr(Num(3.0))))))
+
+let comparison _ = assert_equal
+~printer:expr_to_string
+(parse_expression @@ lexProgram "1 > 1 and 1 < 3 or 1 >= 1 and 1 <= 3")
+(BinaryExpr(OR,
+(BinaryExpr(AND,
+  (BinaryExpr(GT, LiteralExpr(Num(1.0)), LiteralExpr(Num(1.0)))),
+  (BinaryExpr(LT, LiteralExpr(Num(1.0)), LiteralExpr(Num(3.0)))))),
+(BinaryExpr(AND,
+  (BinaryExpr(GT_EQ, LiteralExpr(Num(1.0)), LiteralExpr(Num(1.0)))),
+  (BinaryExpr(LT_EQ, LiteralExpr(Num(1.0)), LiteralExpr(Num(3.0))))))))
+
+
+
+
 let suite =
   "AST" >:::
     ["Binary Add" >:: addition;
@@ -55,7 +76,9 @@ let suite =
       "Binary Div" >:: division;
       "Binary Math Ops" >:: mixed_math_operators;
       "Logical Ops" >:: logical_operators;
-      "Unary Exprs" >:: unary_expr;]
+      "Unary Exprs" >:: unary_expr;
+      "Equality Ops" >:: equality;
+      "Comparison Ops" >:: comparison;]
   ;;
   
   let () =

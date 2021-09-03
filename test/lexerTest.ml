@@ -3,7 +3,7 @@ open Lib
 
 let operators _ = assert_equal
   ~printer:token_list_to_string
-  (lexProgram "+ - * / ( ) = \t \n +")
+  (lexProgram "+ - * / ( ) = == > < >= <= != \t \n +")
   [
     Token(PLUS, 1);
     Token(MINUS, 1);
@@ -11,7 +11,13 @@ let operators _ = assert_equal
     Token(SLASH, 1);
     Token(LEFT_PAREN, 1); 
     Token(RIGHT_PAREN, 1);
-    Token(EQUAL, 1);
+    Token(EQ, 1);
+    Token(EQ_EQ, 1);
+    Token(GT, 1);
+    Token(LT, 1);
+    Token(GT_EQ, 1);
+    Token(LT_EQ, 1);
+    Token(NOT_EQ, 1);
     Token(PLUS, 2)
   ]
 

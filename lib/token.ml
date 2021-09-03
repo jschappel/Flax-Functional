@@ -1,7 +1,13 @@
 type tokenType = 
     LEFT_PAREN 
     | RIGHT_PAREN 
-    | EQUAL
+    | EQ
+    | EQ_EQ
+    | GT
+    | GT_EQ
+    | LT
+    | LT_EQ
+    | NOT_EQ
     | PLUS 
     | MINUS 
     | STAR 
