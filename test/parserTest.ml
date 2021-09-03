@@ -109,6 +109,22 @@ let let_expression4 _ = assert_equal
   ],
   (BinaryExpr(PLUS, LiteralExpr(Ident("x")), LiteralExpr(Ident("y"))))))
 
+
+let lambda_single _ = assert_equal
+  ~printer:expr_to_string
+  (parse_expression @@ lexProgram "fn x = x + 10")
+  (FuncExpr(
+    ["x"],
+    BinaryExpr(PLUS, LiteralExpr(Ident("x")), LiteralExpr(Num(10.0)))))
+
+let lambda_mult _ = assert_equal
+  ~printer:expr_to_string
+  (parse_expression @@ lexProgram "fn x, y = x + y")
+  (FuncExpr(
+    ["x"; "y"],
+    BinaryExpr(PLUS, LiteralExpr(Ident("x")), LiteralExpr(Ident("y")))))
+
+
 let suite =
   "AST" >:::
     ["Binary Add" >:: addition;
@@ -124,7 +140,9 @@ let suite =
       "Single Let Expr" >:: let_expression1;
       "Multipule Let Expr" >:: let_expression2;
       "Trailing ',' Let Expr" >:: let_expression3;
-      "Nested Let Expr" >:: let_expression4;]
+      "Nested Let Expr" >:: let_expression4;
+      "Single Arg lambda" >:: lambda_single;
+      "Multi Arg lambda" >:: lambda_mult;]
   ;;
   
   let () =

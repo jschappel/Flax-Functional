@@ -6,11 +6,24 @@ let rec parse_expression (tokens: token list): expression =
   let (exp, _) = parse_expression_helper  tokens in exp
 
 and parse_expression_helper = function 
-| (Token(IF, _)::xs) -> parse_if_expr xs
-| (Token(LET, _)::xs) -> parse_let_expr xs
+| Token(IF, _)::xs -> parse_if_expr xs
+| Token(LET, _)::xs -> parse_let_expr xs
+| Token(FUN, _)::xs -> parse_fn_expr xs
 | tokens -> parse_or_expr tokens
 
 (* TODO(jschappel): function expr goes here *)
+and parse_fn_expr tokens =
+  let rec parse_args l acc: (string list * token list) =
+    match l with
+    | Token(IDENTIFIER(i),_)::Token(COMMA,_)::xs -> parse_args xs @@ acc@[i]
+    | Token(IDENTIFIER(i),_)::xs -> (acc@[i], xs)
+    | _ -> raise @@ ParseError("Invalid lambda synatx. Expected identifier") in
+  let (args, xs) = parse_args tokens [] in
+  match xs with
+  | Token(EQ, _)::xs -> let (body, xs) = parse_expression_helper xs in (FuncExpr(args, body), xs)
+  | _ -> raise @@ ParseError("Invalid lambda synatx. Expected '=' after parameters")
+
+
 and parse_let_expr tokens =
   let parse_single_let = function
     | Token(IDENTIFIER(i),_)::Token(EQ,_)::xs ->

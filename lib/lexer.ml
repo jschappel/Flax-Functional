@@ -7,7 +7,7 @@ exception LexError of string * int
 let map = Map.of_alist_exn (module String) [
   ("let", LET);
   ("in", IN);
-  ("fun", FUN);
+  ("fn", FUN);
   ("if", IF);
   ("then", THEN);
   ("else", ELSE);

@@ -6,6 +6,7 @@ type literal =
   | Ident of string
 
 type expression =
+  | FuncExpr of string list * expression
   | LetExpr of (string * expression) list * expression
   | IfExpr of expression * expression * expression 
   | BinaryExpr of tokenType * expression * expression
