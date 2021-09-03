@@ -11,7 +11,6 @@ and parse_expression_helper = function
 | Token(FUN, _)::xs -> parse_fn_expr xs
 | tokens -> parse_or_expr tokens
 
-(* TODO(jschappel): function expr goes here *)
 and parse_fn_expr tokens =
   let rec parse_args l acc: (string list * token list) =
     match l with
@@ -62,16 +61,28 @@ and parse_or_expr tokens =
   loop xs exp1
 
 and parse_and_expr tokens =
-  let (exp1, xs) = parse_equality_expr tokens in
+  let (exp1, xs) = parse_call_expr tokens in
   let rec loop (l: token list) (acc: expression) = 
     match l with
     | (Token(AND, _)::xs) -> 
-      let (exp2, xs) = parse_equality_expr xs in                            
+      let (exp2, xs) = parse_call_expr xs in                            
       loop xs (BinaryExpr(AND, acc, exp2))
     | _ -> (acc, l) in
   loop xs exp1
 
-(* TODO(jschappel): Conditional goes here *)
+and parse_call_expr tokens =
+  let rec parse_args l acc: (expression list * token list) =
+    let (exp, xs) = parse_expression_helper l in
+    match xs with
+    | Token(COMMA,_)::xs -> parse_args xs @@ acc@[exp]
+    | Token(RIGHT_PAREN,_)::xs -> (acc@[exp], xs)
+    | _ -> raise @@ ParseError("Invalid call synatx. Expected either ',' or ')'") in
+  match tokens with
+  | Token(IDENTIFIER(i), _)::Token(LEFT_PAREN, _)::Token(RIGHT_PAREN, _)::xs ->
+    (CallExpr(i,[]), xs)
+  | Token(IDENTIFIER(i), _)::Token(LEFT_PAREN, _)::xs ->
+    let (args, xs) = parse_args xs [] in (CallExpr(i,args), xs)
+  | _ -> parse_equality_expr tokens
 
 and parse_equality_expr tokens =
   let (exp1, xs) = parse_comparison_expr tokens in

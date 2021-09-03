@@ -7,6 +7,7 @@ type literal =
 
 type expression =
   | FuncExpr of string list * expression
+  | CallExpr of string * expression list
   | LetExpr of (string * expression) list * expression
   | IfExpr of expression * expression * expression 
   | BinaryExpr of tokenType * expression * expression

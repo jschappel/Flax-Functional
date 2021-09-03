@@ -124,6 +124,25 @@ let lambda_mult _ = assert_equal
     ["x"; "y"],
     BinaryExpr(PLUS, LiteralExpr(Ident("x")), LiteralExpr(Ident("y")))))
 
+let empty_arg_call _ = assert_equal
+~printer:expr_to_string
+(parse_expression @@ lexProgram "x()")
+(CallExpr("x", []))
+
+let single_arg_call _ = assert_equal
+~printer:expr_to_string
+(parse_expression @@ lexProgram "x(10)")
+(CallExpr("x",
+  [LiteralExpr(Num(10.0))]))
+
+let mult_arg_call _ = assert_equal
+  ~printer:expr_to_string
+  (parse_expression @@ lexProgram "add(10, y + 20)")
+  (CallExpr("add",
+    [
+      LiteralExpr(Num(10.0));
+      BinaryExpr(PLUS, LiteralExpr(Ident("y")), LiteralExpr(Num(20.0)))
+    ]))
 
 let suite =
   "AST" >:::
@@ -142,7 +161,10 @@ let suite =
       "Trailing ',' Let Expr" >:: let_expression3;
       "Nested Let Expr" >:: let_expression4;
       "Single Arg lambda" >:: lambda_single;
-      "Multi Arg lambda" >:: lambda_mult;]
+      "Multi Arg lambda" >:: lambda_mult;
+      "Call Single Arg" >:: single_arg_call;
+      "Call Mult Args" >:: mult_arg_call;
+      "Call Empty Args" >:: empty_arg_call;]
   ;;
   
   let () =
