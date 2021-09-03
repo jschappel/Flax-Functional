@@ -7,11 +7,25 @@ let rec parse_expression (tokens: token list): expression =
 
 and parse_expression_helper = function 
 | (Token(IF, _)::xs) -> parse_if_expr xs
-| (Token(LET, _)::xs) -> parse_and_expr xs
+| (Token(LET, _)::xs) -> parse_let_expr xs
 | tokens -> parse_or_expr tokens
 
 (* TODO(jschappel): function expr goes here *)
-(* TODO(jschappel): let expr goes here *)
+and parse_let_expr tokens =
+  let parse_single_let = function
+    | Token(IDENTIFIER(i),_)::Token(EQ,_)::xs ->
+      let (exp1, xs) = parse_expression_helper xs in ((i, exp1), xs)
+    | _ -> raise @@ ParseError("Invalid let synatx. Expected identifier follwoed by '='") in
+  let rec loop l a = 
+    let (exp, xs) = parse_single_let l in
+    let exprs = a @ [exp] in (* *)
+    match xs with
+    | Token(IN, _)::xs | Token(COMMA, _)::Token(IN, _)::xs -> (* Allow for trailing comma on let exprs *)
+      let (body, xs) = parse_expression_helper xs in (LetExpr(exprs, body), xs)
+    | Token(COMMA, _)::xs -> loop xs exprs
+    | _ ->  raise @@ ParseError("Invalid let synatx. Expected 'in' or ','") in
+  loop tokens []
+
 and parse_if_expr (tokens: token list): (expression * token list) = 
   let (cond_expr, xs) = parse_expression_helper tokens in
   match xs with
@@ -103,6 +117,7 @@ and parse_unary_expr = function
 and parse_literal_exp = function
 | Token(NUMBER(num), _)::xs -> (LiteralExpr(Num(num)), xs)
 | Token(BOOL(b), _)::xs -> (LiteralExpr(Bool(b)), xs)
+| Token(IDENTIFIER(i), _)::xs -> (LiteralExpr(Ident(i)), xs)
 | Token(tt, line)::_ -> let open Debug in raise @@ ParseError("Invalid Token supplied at line:" ^ 
                           (Int.to_string line) ^ " .Given: " ^ (tokenType_to_string tt))
 | [] -> raise @@ ParseError("Unreachable")

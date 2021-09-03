@@ -11,6 +11,7 @@ let tokenType_to_string = function
 | SLASH         -> "/"
 | LEFT_PAREN    -> "'('"
 | RIGHT_PAREN   -> "')'"
+| COMMA         -> ","
 | EQ            -> "="
 | EQ_EQ         -> "=="
 | GT            -> ">"
@@ -43,10 +44,15 @@ let token_list_to_string tokens =
 
 
 let rec expr_to_string expr = 
+  let trim_end s =
+    String.of_char_list @@ List.rev @@ List.drop_while (List.rev @@ String.to_list s) ~f:(Char.equal ' ') in
   let literal_to_string = function 
     | Num(n) -> Float.to_string n
-    | Bool(b) -> Bool.to_string b in 
+    | Bool(b) -> Bool.to_string b
+    | Ident(i) -> i in 
   match expr with
+    | LetExpr(l, body) -> let exprs = List.fold_left l ~init: "(let [" ~f:(fun a (s,e) -> a ^ "(" ^ s ^ " = " ^(expr_to_string e) ^ ") ") in
+      (trim_end exprs) ^ "] in " ^ (expr_to_string body) ^ ")"
     | IfExpr(exp1, exp2, exp3) -> "(if " ^ (expr_to_string exp1) ^ " " ^ (expr_to_string exp2) ^ " " ^ (expr_to_string exp3) ^ ")"
     | BinaryExpr(op, exp1, exp2) -> "(" ^ (tokenType_to_string op) ^ " " ^ (expr_to_string exp1) ^ " " ^ expr_to_string exp2 ^ ")"
     | UnaryExpr(op, exp) -> "(" ^ (tokenType_to_string op) ^ " " ^ (expr_to_string exp) ^ ")"

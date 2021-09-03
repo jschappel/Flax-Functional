@@ -66,13 +66,48 @@ let comparison _ = assert_equal
     (BinaryExpr(LT_EQ, LiteralExpr(Num(1.0)), LiteralExpr(Num(3.0))))))))
 
 let if_expression _ = assert_equal
-  ~printer:expr_to_string
+~printer:expr_to_string
 (parse_expression @@ lexProgram "if 5 > 1 then true else false")
 (IfExpr(
   (BinaryExpr(GT, LiteralExpr(Num(5.0)), LiteralExpr(Num(1.0)))),
   (LiteralExpr(Bool(true))),
   (LiteralExpr(Bool(false)))))
 
+let let_expression1 _ = assert_equal
+~printer:expr_to_string
+(parse_expression @@ lexProgram "let x = 10 in x")
+(LetExpr(
+  [("x", LiteralExpr(Num(10.0)))],
+  LiteralExpr(Ident("x"))))
+
+let let_expression2 _ = assert_equal
+~printer:expr_to_string
+(parse_expression @@ lexProgram "let x = 10, y = 20 in x + y")
+(LetExpr(
+  [
+    ("x", LiteralExpr(Num(10.0)));
+    ("y", LiteralExpr(Num(20.0)));
+  ],
+  (BinaryExpr(PLUS, LiteralExpr(Ident("x")), LiteralExpr(Ident("y"))))))
+
+let let_expression3 _ = assert_equal
+  ~printer:expr_to_string
+  (parse_expression @@ lexProgram "let x = 10, in x")
+  (LetExpr(
+    [("x", LiteralExpr(Num(10.0)))],
+    LiteralExpr(Ident("x"))))
+
+let let_expression4 _ = assert_equal
+  ~printer:expr_to_string
+  (parse_expression @@ lexProgram "let x = let xx = 10 in xx + 1, y = 20 in x + y")
+  (LetExpr(
+  [
+    ("x", (LetExpr(
+            [("xx", LiteralExpr(Num(10.0)))],
+            (BinaryExpr(PLUS, LiteralExpr(Ident("xx")), LiteralExpr(Num(1.0)))))));
+    ("y", LiteralExpr(Num(20.0)));
+  ],
+  (BinaryExpr(PLUS, LiteralExpr(Ident("x")), LiteralExpr(Ident("y"))))))
 
 let suite =
   "AST" >:::
@@ -85,9 +120,16 @@ let suite =
       "Unary Exprs" >:: unary_expr;
       "Equality Ops" >:: equality;
       "Comparison Ops" >:: comparison;
-      "Basic_If Expr" >:: if_expression]
+      "Basic_If Expr" >:: if_expression;
+      "Single Let Expr" >:: let_expression1;
+      "Multipule Let Expr" >:: let_expression2;
+      "Trailing ',' Let Expr" >:: let_expression3;
+      "Nested Let Expr" >:: let_expression4;]
   ;;
   
   let () =
     run_test_tt_main suite
   ;;
+
+
+  "let x = let xx = 10 in xx + 1 in x + 3"
