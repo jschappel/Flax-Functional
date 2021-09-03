@@ -2,13 +2,27 @@ open Token
 open CoreProgram
 
 exception ParseError of string
+let rec parse_expression (tokens: token list): expression =
+  let (exp, _) = parse_expression_helper  tokens in exp
 
-let rec parse_expression exp = 
-  let (p, _) = parse_or_expr exp in p 
+and parse_expression_helper = function 
+| (Token(IF, _)::xs) -> parse_if_expr xs
+| (Token(LET, _)::xs) -> parse_and_expr xs
+| tokens -> parse_or_expr tokens
 
 (* TODO(jschappel): function expr goes here *)
 (* TODO(jschappel): let expr goes here *)
-(* TODO(jschappel): if expr goes here *)
+and parse_if_expr (tokens: token list): (expression * token list) = 
+  let (cond_expr, xs) = parse_expression_helper tokens in
+  match xs with
+  | (Token(THEN, _)::xs) ->
+    let (then_expr, xs) = parse_expression_helper xs in
+    (match xs with
+    | (Token(ELSE, _)::xs) -> 
+      let (else_expr, xs) = parse_expression_helper xs in
+      (IfExpr(cond_expr, then_expr, else_expr), xs)
+    | _ -> raise @@ ParseError("Invaid if statement form. Expected keyword: 'else' in form if exp then exp else exp"))
+  | _ -> raise @@ ParseError("Invaid if statement form. Expected keyword: 'then' in form if exp then exp else exp")
 
 and parse_or_expr tokens =
   let (exp1, xs) = parse_and_expr tokens in

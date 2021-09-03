@@ -47,6 +47,7 @@ let rec expr_to_string expr =
     | Num(n) -> Float.to_string n
     | Bool(b) -> Bool.to_string b in 
   match expr with
+    | IfExpr(exp1, exp2, exp3) -> "(if " ^ (expr_to_string exp1) ^ " " ^ (expr_to_string exp2) ^ " " ^ (expr_to_string exp3) ^ ")"
     | BinaryExpr(op, exp1, exp2) -> "(" ^ (tokenType_to_string op) ^ " " ^ (expr_to_string exp1) ^ " " ^ expr_to_string exp2 ^ ")"
     | UnaryExpr(op, exp) -> "(" ^ (tokenType_to_string op) ^ " " ^ (expr_to_string exp) ^ ")"
     | LiteralExpr(lit) -> literal_to_string lit

@@ -58,14 +58,20 @@ let comparison _ = assert_equal
 ~printer:expr_to_string
 (parse_expression @@ lexProgram "1 > 1 and 1 < 3 or 1 >= 1 and 1 <= 3")
 (BinaryExpr(OR,
-(BinaryExpr(AND,
-  (BinaryExpr(GT, LiteralExpr(Num(1.0)), LiteralExpr(Num(1.0)))),
-  (BinaryExpr(LT, LiteralExpr(Num(1.0)), LiteralExpr(Num(3.0)))))),
-(BinaryExpr(AND,
-  (BinaryExpr(GT_EQ, LiteralExpr(Num(1.0)), LiteralExpr(Num(1.0)))),
-  (BinaryExpr(LT_EQ, LiteralExpr(Num(1.0)), LiteralExpr(Num(3.0))))))))
+  (BinaryExpr(AND,
+    (BinaryExpr(GT, LiteralExpr(Num(1.0)), LiteralExpr(Num(1.0)))),
+    (BinaryExpr(LT, LiteralExpr(Num(1.0)), LiteralExpr(Num(3.0)))))),
+  (BinaryExpr(AND,
+    (BinaryExpr(GT_EQ, LiteralExpr(Num(1.0)), LiteralExpr(Num(1.0)))),
+    (BinaryExpr(LT_EQ, LiteralExpr(Num(1.0)), LiteralExpr(Num(3.0))))))))
 
-
+let if_expression _ = assert_equal
+  ~printer:expr_to_string
+(parse_expression @@ lexProgram "if 5 > 1 then true else false")
+(IfExpr(
+  (BinaryExpr(GT, LiteralExpr(Num(5.0)), LiteralExpr(Num(1.0)))),
+  (LiteralExpr(Bool(true))),
+  (LiteralExpr(Bool(false)))))
 
 
 let suite =
@@ -78,7 +84,8 @@ let suite =
       "Logical Ops" >:: logical_operators;
       "Unary Exprs" >:: unary_expr;
       "Equality Ops" >:: equality;
-      "Comparison Ops" >:: comparison;]
+      "Comparison Ops" >:: comparison;
+      "Basic_If Expr" >:: if_expression]
   ;;
   
   let () =

@@ -6,7 +6,7 @@ exe: main.exe
 
 main.exe: install
 
-fast_test:
+fast_test: install
 	dune runtest
 
 test: clean install

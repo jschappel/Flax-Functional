@@ -5,6 +5,7 @@ type literal =
   | Bool of bool
 
 type expression =
+  | IfExpr of expression * expression * expression 
   | BinaryExpr of tokenType * expression * expression
   | UnaryExpr of tokenType * expression
   | LiteralExpr of literal
