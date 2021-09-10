@@ -1,6 +1,6 @@
 ;; see https://github.com/gildor478/ounit/tree/master/examples for test examples
 (tests
- (names lexerTest parserTest)
+ (names lexerTest parserTest structures)
  (libraries ounit2 lib))
 
 (env

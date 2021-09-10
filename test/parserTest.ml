@@ -170,6 +170,3 @@ let suite =
   let () =
     run_test_tt_main suite
   ;;
-
-
-  "let x = let xx = 10 in xx + 1 in x + 3"

@@ -66,3 +66,7 @@ let rec expr_to_string expr =
     | UnaryExpr(op, exp) -> "(" ^ (tokenType_to_string op) ^ " " ^ (expr_to_string exp) ^ ")"
     | LiteralExpr(lit) -> literal_to_string lit
     
+
+let val_to_string = function
+| Value.Num(n) -> Float.to_string n
+| Value.Bool(b) -> Bool.to_string b
