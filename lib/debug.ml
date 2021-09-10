@@ -68,5 +68,5 @@ let rec expr_to_string expr =
     
 
 let val_to_string = function
-| Value.Num(n) -> Float.to_string n
-| Value.Bool(b) -> Bool.to_string b
+| Value.NumVal(n) -> Float.to_string n
+| Value.BoolVal(b) -> Bool.to_string b

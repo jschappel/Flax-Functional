@@ -7,19 +7,19 @@ let opt_to_str = function
 | None -> "NONE"
 
 
-let e1 = ExtEnv([("x", Num(10.0));("y", Bool(true))], 
-            ExtEnv([("xx", Num(10.0));("yy", Bool(true))], EmptyEnv))
+let e1 = ExtEnv([("x", NumVal(10.0));("y", BoolVal(true))], 
+            ExtEnv([("xx", NumVal(10.0));("yy", BoolVal(true))], EmptyEnv))
 
 let enviroment_lookup _ : unit = assert_equal
   ~cmp:(fun x y -> equal_option Lib.cmp x y)
   ~printer:opt_to_str
-  (Some(Num(10.0)))
+  (Some(NumVal(10.0)))
   (get_value e1 "x")
 
 let enviroment_lookup2 _ : unit = assert_equal
   ~cmp:(fun x y -> equal_option Lib.cmp x y)
   ~printer:opt_to_str
-  (Some(Bool(true)))
+  (Some(BoolVal(true)))
   (get_value e1 "yy")
 
 
