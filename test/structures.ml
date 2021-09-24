@@ -23,8 +23,6 @@ let enviroment_lookup2 _ : unit = assert_equal
   (get_value e1 "yy")
 
 
-
-
 let suite =
   "Enviroment" >:::
    ["Root Lev Lookup" >:: enviroment_lookup;
