@@ -1,4 +1,5 @@
 open CoreProgram
+open Token
 open Enviroment
 open Value
 
@@ -27,11 +28,17 @@ and value_of_binary op exp1 exp2 env =
   let v1 = value_of exp1 env in
   let v2 = value_of exp2 env in
   match (op, v1, v2) with
+  (* Basic Math operations *)
   | PLUS, NumVal(n1), NumVal(n2) -> NumVal(n1 +. n2)
   | MINUS, NumVal(n1), NumVal(n2) -> NumVal(n1 -. n2)
   | STAR, NumVal(n1), NumVal(n2) -> NumVal(n1 *. n2)
   | SLASH, NumVal(n1), NumVal(n2) -> NumVal(n1 /. n2)
-  | _ -> raise @@ InterpreterError "'+' operator expects two numbers"
+  | GT, NumVal(n1), NumVal(n2) -> BoolVal(n1 > n2)
+  | LT, NumVal(n1), NumVal(n2) -> BoolVal(n1 < n2)
+  | GT_EQ, NumVal(n1), NumVal(n2) -> BoolVal(n1 >= n2)
+  | LT_EQ, NumVal(n1), NumVal(n2) -> BoolVal(n1 <= n2)
+  | GT, v1, v2 when is_truthy v1 && is_truthy v2-> NumVal(1.2)
+  | _ -> raise @@ InterpreterError (Printf.sprintf "Invalid. Oprerator '%s' expects two numbers" @@ show_tokenType op)
 
 and value_of_unary op exp env =
   let v = value_of exp env in

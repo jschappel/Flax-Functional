@@ -27,5 +27,6 @@ type tokenType =
     | NUMBER of float
     | STRING of string
     | BOOL of bool
+    [@@deriving show, eq]
 
-type token = Token of tokenType * int
+type token = Token of tokenType * int [@@deriving show]

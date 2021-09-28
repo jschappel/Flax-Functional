@@ -1,5 +1,9 @@
 open OUnit2
 open Lib
+open Base
+
+let token_list_to_string l = 
+  List.fold_right ~f:(fun x a -> a ^ show_token x ^ " ") l ~init:"["
 
 let operators _ = assert_equal
   ~printer:token_list_to_string

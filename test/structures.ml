@@ -1,9 +1,9 @@
 open Lib
 open OUnit2
-open Core
+open Base 
 
 let opt_to_str = function 
-| Some(v) -> val_to_string v
+| Some(v) -> show_value v
 | None -> "NONE"
 
 
@@ -11,13 +11,13 @@ let e1 = ExtEnv([("x", NumVal(10.0));("y", BoolVal(true))],
             ExtEnv([("xx", NumVal(10.0));("yy", BoolVal(true))], EmptyEnv))
 
 let enviroment_lookup _ : unit = assert_equal
-  ~cmp:(fun x y -> equal_option Lib.cmp x y)
+  ~cmp:(fun x y -> equal_option equal_value x y)
   ~printer:opt_to_str
   (Some(NumVal(10.0)))
   (get_value e1 "x")
 
 let enviroment_lookup2 _ : unit = assert_equal
-  ~cmp:(fun x y -> equal_option Lib.cmp x y)
+  ~cmp:(fun x y -> equal_option equal_value x y)
   ~printer:opt_to_str
   (Some(BoolVal(true)))
   (get_value e1 "yy")

@@ -1,7 +1,13 @@
-type value = NumVal of float | BoolVal of bool
+open CoreProgram
 
-let cmp v1 v2 = 
-  match (v1, v2) with 
-  | NumVal(n1), NumVal(n2) -> n1 = n2
-  | BoolVal(b1), BoolVal(b2) -> b1 = b2
-  | _  -> false
+type value = 
+  NumVal of float 
+  | BoolVal of bool
+  | FuncVal of string * string list * expression
+  [@@deriving show, eq]
+
+
+let value_to_string = function
+| NumVal(n)       -> Float.to_string n
+| BoolVal(b)      -> Bool.to_string b
+| FuncVal(n,_,_)  -> "<func " ^ n ^ ">"

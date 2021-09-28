@@ -9,3 +9,4 @@ type expression =
   | UnaryExpr of tokenType * expression
   | LiteralExpr of literal
   and literal = Num of float | Bool of bool | Ident of string
+  [@@deriving show, eq]

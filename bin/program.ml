@@ -10,6 +10,6 @@ let () =
     match In_channel.input_line stdin with
       | Some("exit") -> exit 0
       | Some(line) -> 
-        Out_channel.print_endline @@ val_to_string @@ run_env line EmptyEnv;
+        Out_channel.print_endline @@ value_to_string @@ run_env line EmptyEnv;
       | None -> Out_channel.print_endline "NULL"
   done

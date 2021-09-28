@@ -140,6 +140,6 @@ and parse_literal_exp = function
 | Token(NUMBER(num), _)::xs -> (LiteralExpr(Num(num)), xs)
 | Token(BOOL(b), _)::xs -> (LiteralExpr(Bool(b)), xs)
 | Token(IDENTIFIER(i), _)::xs -> (LiteralExpr(Ident(i)), xs)
-| Token(tt, line)::_ -> let open Debug in raise @@ ParseError("Invalid Token supplied at line:" ^ 
-                          (Int.to_string line) ^ " .Given: " ^ (tokenType_to_string tt))
+| Token(tt, line)::_ ->  raise @@ ParseError("Invalid Token supplied at line:" ^ 
+                          (Int.to_string line) ^ " .Given: " ^ (show_tokenType tt))
 | [] -> raise @@ ParseError("Unreachable")
