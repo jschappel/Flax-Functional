@@ -1,7 +1,6 @@
 open CoreProgram
 open Token
 open Enviroment
-open Value
 
 exception InterpreterError of string
 

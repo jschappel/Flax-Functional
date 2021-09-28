@@ -1,10 +1,15 @@
-open Value
 open Base
+open CoreProgram
 
 type enviroment = 
   EmptyEnv 
   | ExtEnv of pair list * enviroment
-  and pair = string * value
+and pair = string * value
+and value = 
+  NumVal of float 
+  | BoolVal of bool
+  | FuncVal of string * string list * expression * enviroment
+  [@@deriving show, eq]
 
 let rec get_value env value =
   match env with 
@@ -24,3 +29,8 @@ let ext_env env pair =
   match env with
   | EmptyEnv -> ExtEnv([pair], EmptyEnv)
   | env -> ExtEnv([pair], env)
+
+let value_to_string = function
+| NumVal(n)       -> Float.to_string n
+| BoolVal(b)      -> Bool.to_string b
+| FuncVal(n,_,_,_)  -> "<func " ^ n ^ ">"
