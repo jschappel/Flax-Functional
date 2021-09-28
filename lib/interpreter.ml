@@ -21,7 +21,13 @@ let rec value_of (exp: expression) (env: enviroment): value =
   | LetExpr(exp_list, body) ->
     let val_list = List.map (fun (s,exp) -> (s, value_of exp env)) exp_list in
     value_of body @@ List.fold_left ext_env env val_list
+  | FuncExpr(params, body) -> FuncVal(params, body, env)
+  | CallExpr(name, params) -> value_of_call name params env
   | _ -> raise @@ InterpreterError "Unreachable" 
+
+and value_of_call name params env =
+  let val_list = List.map (fun v -> value_of v env) params in
+  let 
 
 and value_of_binary op exp1 exp2 env =
   let v1 = value_of exp1 env in

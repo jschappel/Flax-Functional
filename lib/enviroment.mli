@@ -7,7 +7,7 @@ and pair = string * value
 and value = 
   NumVal of float 
   | BoolVal of bool
-  | FuncVal of string * string list * expression * enviroment
+  | FuncVal of string list * expression * enviroment
   [@@deriving show, eq]
 
 val get_value : enviroment -> string -> value option

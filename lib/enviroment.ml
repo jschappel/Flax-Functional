@@ -8,7 +8,7 @@ and pair = string * value
 and value = 
   NumVal of float 
   | BoolVal of bool
-  | FuncVal of string * string list * expression * enviroment
+  | FuncVal of string list * expression * enviroment
   [@@deriving show, eq]
 
 let rec get_value env value =
@@ -33,4 +33,4 @@ let ext_env env pair =
 let value_to_string = function
 | NumVal(n)       -> Float.to_string n
 | BoolVal(b)      -> Bool.to_string b
-| FuncVal(n,_,_,_)  -> "<func " ^ n ^ ">"
+| FuncVal(_,_,_)  -> "<func " ^ ">"
