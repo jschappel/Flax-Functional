@@ -65,6 +65,7 @@ let lexProgram prog =
                  let xs = List.drop txt size in
                  Token(tt, line) :: lexLine xs line
         | '/' -> Token(SLASH, line) :: lexLine xs line
+        | '=' when equal_option Char.equal (List.hd xs) (Some('>')) -> Token(ARROW, line) :: lexLine (List.drop xs 1) line
         | '=' when equal_option Char.equal (List.hd xs) (Some('=')) -> Token(EQ_EQ, line) :: lexLine (List.drop xs 1) line
         | '=' -> Token(EQ, line) :: lexLine xs line
         | '>' when equal_option Char.equal (List.hd xs) (Some('=')) -> Token(GT_EQ, line) :: lexLine (List.drop xs 1) line

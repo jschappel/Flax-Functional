@@ -7,7 +7,7 @@ and pair = string * value
 and value = 
   NumVal of float 
   | BoolVal of bool
-  | FuncVal of string list * expression * enviroment
+  | ProcVal of string list * expression * enviroment
   [@@deriving show, eq]
 
 val get_value : enviroment -> string -> value option
@@ -16,6 +16,6 @@ val get_value : enviroment -> string -> value option
 val add_value : enviroment -> pair -> enviroment
 
 (* Creates a new enviroment with the given pair added*)
-val ext_env : enviroment -> pair -> enviroment
+val ext_env : enviroment -> pair list -> enviroment
 
 val value_to_string : value -> string

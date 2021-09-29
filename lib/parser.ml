@@ -14,13 +14,14 @@ and parse_expression_helper = function
 and parse_fn_expr tokens =
   let rec parse_args l acc: (string list * token list) =
     match l with
+    | Token(ARROW,_)::_ -> ([],l) (* If no args then just continue *)
     | Token(IDENTIFIER(i),_)::Token(COMMA,_)::xs -> parse_args xs @@ acc@[i]
     | Token(IDENTIFIER(i),_)::xs -> (acc@[i], xs)
     | _ -> raise @@ ParseError("Invalid lambda synatx. Expected identifier") in
   let (args, xs) = parse_args tokens [] in
   match xs with
-  | Token(EQ, _)::xs -> let (body, xs) = parse_expression_helper xs in (FuncExpr(args, body), xs)
-  | _ -> raise @@ ParseError("Invalid lambda synatx. Expected '=' after parameters")
+  | Token(ARROW, _)::xs -> let (body, xs) = parse_expression_helper xs in (FuncExpr(args, body), xs)
+  | _ -> raise @@ ParseError("Invalid lambda synatx. Expected '=>' after parameters")
 
 
 and parse_let_expr tokens =

@@ -112,14 +112,14 @@ let let_expression4 _ = assert_equal
 
 let lambda_single _ = assert_equal
   ~printer:show_expression
-  (parse_expression @@ lexProgram "fn x = x + 10")
+  (parse_expression @@ lexProgram "fn x => x + 10")
   (FuncExpr(
     ["x"],
     BinaryExpr(PLUS, LiteralExpr(Ident("x")), LiteralExpr(Num(10.0)))))
 
 let lambda_mult _ = assert_equal
   ~printer:show_expression
-  (parse_expression @@ lexProgram "fn x, y = x + y")
+  (parse_expression @@ lexProgram "fn x, y => x + y")
   (FuncExpr(
     ["x"; "y"],
     BinaryExpr(PLUS, LiteralExpr(Ident("x")), LiteralExpr(Ident("y")))))

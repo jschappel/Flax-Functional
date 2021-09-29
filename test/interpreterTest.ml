@@ -60,6 +60,42 @@ let multi_let_expr _ = assert_equal
   (run "let x = 20, y = 30 in x > y")
   (BoolVal(false))
 
+let and_expr _ = assert_equal
+  ~printer:show_value
+  (run "true and false")
+  (BoolVal(false))
+
+let or_expr _ = assert_equal
+  ~printer:show_value
+  (run "true or false")
+  (BoolVal(true))
+
+let func_no_args _ = assert_equal
+  ~printer:show_value
+  (run "let truth = fn => true in truth() or false")
+  (BoolVal(true))
+
+let func_arg _ = assert_equal
+  ~printer:show_value
+  (run "let add10 = fn y => 10 + y in add10(70)")
+  (NumVal(80.0))
+
+let func_args _ = assert_equal
+  ~printer:show_value
+  (run "let add = fn x, y => x + y in add(10, 20)")
+  (NumVal(30.0))
+
+let nested_funcs _ = assert_equal
+  ~printer:show_value
+  (run 
+  "let x = 200 
+    in let f = fn z => z - x
+     in let x = 100 
+      in let g = fn z => z - x 
+        in f(1) - g(1)")
+  (NumVal(-100.0))
+
+
 let suite =
   "Interpreter" >:::
    ["Addition" >:: addition;
@@ -71,8 +107,14 @@ let suite =
     "Greater Then" >:: greater;
     "Less hen or Equal" >:: less_eq;
     "Greater Then or Equal" >:: greater_eq;
+    "Add" >:: and_expr;
+    "Or" >:: or_expr;
     "Let Expression" >:: let_expr;
     "Multi Let Expression" >:: multi_let_expr;
+    "Function No Args" >:: func_no_args;
+    "Function Single Args" >:: func_arg;
+    "Function Multipule Args" >:: func_args;
+    "Closure1" >:: nested_funcs;
     ]
   ;;
 

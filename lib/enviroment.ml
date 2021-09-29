@@ -8,7 +8,7 @@ and pair = string * value
 and value = 
   NumVal of float 
   | BoolVal of bool
-  | FuncVal of string list * expression * enviroment
+  | ProcVal of string list * expression * enviroment
   [@@deriving show, eq]
 
 let rec get_value env value =
@@ -25,12 +25,9 @@ let add_value env pair =
   | EmptyEnv -> ExtEnv([pair], EmptyEnv)
   | ExtEnv(l, env) -> ExtEnv(pair::l, env)
 
-let ext_env env pair =
-  match env with
-  | EmptyEnv -> ExtEnv([pair], EmptyEnv)
-  | env -> ExtEnv([pair], env)
+let ext_env env pair = ExtEnv(pair, env)
 
 let value_to_string = function
 | NumVal(n)       -> Float.to_string n
 | BoolVal(b)      -> Bool.to_string b
-| FuncVal(_,_,_)  -> "<func " ^ ">"
+| ProcVal(_,_,_)  -> "<func " ^ ">"

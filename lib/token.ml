@@ -2,6 +2,7 @@ type tokenType =
     LEFT_PAREN 
     | RIGHT_PAREN 
     | COMMA
+    | ARROW
     | EQ
     | EQ_EQ
     | GT
