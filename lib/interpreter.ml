@@ -9,7 +9,29 @@ let is_truthy = function
 | BoolVal(false) -> false
 | _ -> true
 
+(* Determins if a variable occurs free in the given env *)
+let rec occurs_free (var:string )(exp: expression): bool =
+  match exp with
+  | LiteralExpr(Ident(v)) -> v = var
+  | FuncExpr(params, body) when not (List.mem var params) -> occurs_free var body
+  | UnaryExpr(_, exp) -> occurs_free var exp
+  | BinaryExpr(_, exp1, exp2) -> occurs_free var exp1 || occurs_free var exp2
+  | IfExpr(e1, e2, e3) -> occurs_free var e1 || occurs_free var e2 || occurs_free var e3
+  | CallExpr(_, params) -> List.fold_left (fun a e -> a || occurs_free var e) false params
+  | LetExpr(exp_list, body) ->
+    let free_in_let_exprs = List.fold_left (fun a (_,e) -> a || occurs_free var e) false exp_list
+    in free_in_let_exprs || occurs_free var body
+  | _ -> false
 
+
+(* Creates the optimized enviroment onyl containing the free vars*)
+let rec make_free_var_env (env: enviroment) (exp: expression) (acc: pair list) : enviroment = 
+  match env with
+  | EmptyEnv -> ext_env EmptyEnv acc 
+  | ExtEnv(l, ext_env) ->
+    let free_vars = acc @ List.filter (fun (s,_) -> occurs_free s exp) l in
+    make_free_var_env ext_env exp free_vars
+    
 let rec value_of (exp: expression) (env: enviroment): value =
   match exp with 
   | BinaryExpr(op, exp1, exp2) -> value_of_binary op exp1 exp2 env
@@ -21,12 +43,12 @@ let rec value_of (exp: expression) (env: enviroment): value =
   | LetExpr(exp_list, body) ->
     let val_list = List.map (fun (s,exp) -> (s, value_of exp env)) exp_list in
     value_of body @@ ext_env env val_list
-  | FuncExpr(params, body) -> ProcVal(params, body, env)
+  | FuncExpr(params, body) -> 
+    let new_env = make_free_var_env env exp [] in ProcVal(params, body, new_env)
   | CallExpr(name, params) -> 
     let rands = List.map (fun v -> value_of v env) params in
     let rator = value_of (LiteralExpr(Ident(name))) env in
     apply_procedure rands name rator
-  | _ -> raise @@ InterpreterError "Unreachable" 
 
 and apply_procedure vals name = function
 | ProcVal(params, body, env) -> 
@@ -75,4 +97,3 @@ and value_of_literal exp env =
     (match get_value env i with 
     | Some(v) -> v
     | None -> raise @@ InterpreterError ("Value " ^ i ^ " not found in enviroment"))
-  | _ -> raise @@ InterpreterError "Invalid literal Expression Supplied"
