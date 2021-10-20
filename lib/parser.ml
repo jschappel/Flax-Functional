@@ -7,7 +7,8 @@ let rec parse_expression (tokens: token list): expression =
 
 and parse_expression_helper = function 
 | Token(IF, _)::xs -> parse_if_expr xs
-| Token(LET, _)::xs -> parse_let_expr xs
+| Token(LET, _)::xs -> parse_let_expr xs false
+| Token(LETREC, _)::xs -> parse_let_expr xs true
 | Token(FUN, _)::xs -> parse_fn_expr xs
 | tokens -> parse_or_expr tokens
 
@@ -24,7 +25,7 @@ and parse_fn_expr tokens =
   | _ -> raise @@ ParseError("Invalid lambda synatx. Expected '=>' after parameters")
 
 
-and parse_let_expr tokens =
+and parse_let_expr tokens isLetRec =
   let parse_single_let = function
     | Token(IDENTIFIER(i),_)::Token(EQ,_)::xs ->
       let (exp1, xs) = parse_expression_helper xs in ((i, exp1), xs)
@@ -34,7 +35,8 @@ and parse_let_expr tokens =
     let exprs = a @ [exp] in (* *)
     match xs with
     | Token(IN, _)::xs | Token(COMMA, _)::Token(IN, _)::xs -> (* Allow for trailing comma on let exprs *)
-      let (body, xs) = parse_expression_helper xs in (LetExpr(exprs, body), xs)
+      let (body, xs) = parse_expression_helper xs in 
+      if isLetRec then (LetRecExpr(exprs, body), xs) else (LetExpr(exprs, body), xs)
     | Token(COMMA, _)::xs -> loop xs exprs
     | _ ->  raise @@ ParseError("Invalid let synatx. Expected 'in' or ','") in
   loop tokens []

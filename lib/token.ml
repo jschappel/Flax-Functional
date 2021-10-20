@@ -15,7 +15,8 @@ type tokenType =
     | STAR 
     | SLASH 
     | DOT
-    | LET 
+    | LET
+    | LETREC
     | IN
     | FUN
     | NOT

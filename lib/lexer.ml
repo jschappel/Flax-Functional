@@ -16,6 +16,7 @@ let map = Map.of_alist_exn (module String) [
   ("or", OR);
   ("not", NOT);
   ("false", BOOL(false));
+  ("letrec", LETREC);
   ]
 
 let lex_number (txt: char list) (line: int): string =
