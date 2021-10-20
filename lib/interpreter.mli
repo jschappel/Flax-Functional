@@ -1,6 +1,8 @@
 open CoreProgram
 open Enviroment
 
+exception InterpreterError of string
+
 val value_of: expression -> enviroment -> value
 
 val occurs_free: string -> expression -> bool

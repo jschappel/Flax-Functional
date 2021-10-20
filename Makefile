@@ -1,6 +1,6 @@
 exe: main.exe
 	$(dune build bin/program.exe)
-	dune exec bin/program.exe
+	rlwrap dune exec bin/program.exe
 	$(echo "")
 
 

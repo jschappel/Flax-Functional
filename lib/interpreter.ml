@@ -4,6 +4,8 @@ open Enviroment
 
 exception InterpreterError of string
 
+let unimplimented = fun _ -> raise @@ Failure("unimplimented!") (* TODO: Move utility function elsewhere *)
+
 
 let is_truthy = function
 | BoolVal(false) -> false
@@ -45,6 +47,7 @@ let rec value_of (exp: expression) (env: enviroment): value =
     value_of body @@ ext_env env val_list
   | FuncExpr(params, body) -> 
     let new_env = make_free_var_env env exp [] in ProcVal(params, body, new_env)
+  | LetRecExpr(exp_list, body) -> unimplimented()
   | CallExpr(name, params) -> 
     let rands = List.map (fun v -> value_of v env) params in
     let rator = value_of (LiteralExpr(Ident(name))) env in

@@ -2,7 +2,13 @@ open Stdio
 open Lib
 
 let run_env line =
-  value_of @@ parse_expression @@ lexProgram line 
+  try 
+    value_to_string @@ value_of (parse_expression @@ lexProgram line) EmptyEnv
+  with 
+    Failure msg -> msg
+    | ParseError e -> e
+    | LexError(e,_) -> e
+    | InterpreterError e -> e 
 
 let () = 
   while true do
@@ -10,6 +16,6 @@ let () =
     match In_channel.input_line stdin with
       | Some("exit") -> exit 0
       | Some(line) -> 
-        Out_channel.print_endline @@ value_to_string @@ run_env line EmptyEnv;
+        Out_channel.print_endline @@ run_env line;
       | None -> Out_channel.print_endline "NULL"
   done
