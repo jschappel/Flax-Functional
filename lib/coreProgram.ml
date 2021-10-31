@@ -4,7 +4,7 @@ type expression =
   | FuncExpr of string list * expression
   | CallExpr of string * expression list
   | LetExpr of (string * expression) list * expression
-  | LetRecExpr of (string * expression) list * expression
+  | LetrecExpr of string * (string list) * expression * expression
   | IfExpr of expression * expression * expression 
   | BinaryExpr of tokenType * expression * expression
   | UnaryExpr of tokenType * expression

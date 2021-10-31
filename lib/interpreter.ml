@@ -12,7 +12,7 @@ let is_truthy = function
 | _ -> true
 
 (* Determins if a variable occurs free in the given env *)
-let rec occurs_free (var:string )(exp: expression): bool =
+let rec occurs_free (var: string )(exp: expression): bool =
   match exp with
   | LiteralExpr(Ident(v)) -> v = var
   | FuncExpr(params, body) when not (List.mem var params) -> occurs_free var body
@@ -47,7 +47,7 @@ let rec value_of (exp: expression) (env: enviroment): value =
     value_of body @@ ext_env env val_list
   | FuncExpr(params, body) -> 
     let new_env = make_free_var_env env exp [] in ProcVal(params, body, new_env)
-  | LetRecExpr(exp_list, body) -> unimplimented()
+  | LetrecExpr(name, args, fbody, body) -> unimplimented()
   | CallExpr(name, params) -> 
     let rands = List.map (fun v -> value_of v env) params in
     let rator = value_of (LiteralExpr(Ident(name))) env in

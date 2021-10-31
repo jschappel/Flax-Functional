@@ -2,13 +2,16 @@ open Token
 open CoreProgram
 
 exception ParseError of string
+
+type ast = expression * token list
+
 let rec parse_expression (tokens: token list): expression =
   let (exp, _) = parse_expression_helper  tokens in exp
 
 and parse_expression_helper = function 
 | Token(IF, _)::xs -> parse_if_expr xs
-| Token(LET, _)::xs -> parse_let_expr xs false
-| Token(LETREC, _)::xs -> parse_let_expr xs true
+| Token(LET, _)::xs -> parse_let_expr xs 
+| Token(LETREC, _)::xs -> parse_letrec_expr xs 
 | Token(FUN, _)::xs -> parse_fn_expr xs
 | tokens -> parse_or_expr tokens
 
@@ -24,8 +27,28 @@ and parse_fn_expr tokens =
   | Token(ARROW, _)::xs -> let (body, xs) = parse_expression_helper xs in (FuncExpr(args, body), xs)
   | _ -> raise @@ ParseError("Invalid lambda synatx. Expected '=>' after parameters")
 
+and parse_letrec_expr (tokens: token list) : ast =
+  let rec parse_args tokens acc =
+    match tokens with
+    | Token(RIGHT_PAREN,_)::xs -> (acc,xs)
+    | Token(IDENTIFIER(arg),_)::Token(RIGHT_PAREN,_)::xs -> ((acc@[arg]),xs)
+    | Token(IDENTIFIER(arg),_)::Token(COMMA,_)::xs -> parse_args xs @@ acc@[arg]
+    | _ -> raise @@ ParseError("Invalid arg syntax. Expected either ')' or <arg>,") in
+  match tokens with 
+  | Token(IDENTIFIER(func_name),_)::Token(LEFT_PAREN,_)::xs -> 
+      (let (args, xs) = parse_args xs [] in
+      match xs with
+      | Token(EQ,_)::xs ->
+          (let (func_body, ys) = parse_expression_helper xs in
+          match ys with 
+          | Token(IN,_)::xs ->
+              let (body,zs) = parse_expression_helper xs in
+              LetrecExpr(func_name, args, func_body, body), zs
+          | _ -> raise @@ ParseError("Exprected '=' after function body"))
+      | _ -> raise @@ ParseError("Expected ') =' after function args"))
+  | _ -> raise @@ ParseError("Invalid letrec syntax")
 
-and parse_let_expr tokens isLetRec =
+and parse_let_expr tokens =
   let parse_single_let = function
     | Token(IDENTIFIER(i),_)::Token(EQ,_)::xs ->
       let (exp1, xs) = parse_expression_helper xs in ((i, exp1), xs)
@@ -35,8 +58,7 @@ and parse_let_expr tokens isLetRec =
     let exprs = a @ [exp] in (* *)
     match xs with
     | Token(IN, _)::xs | Token(COMMA, _)::Token(IN, _)::xs -> (* Allow for trailing comma on let exprs *)
-      let (body, xs) = parse_expression_helper xs in 
-      if isLetRec then (LetRecExpr(exprs, body), xs) else (LetExpr(exprs, body), xs)
+      let (body, xs) = parse_expression_helper xs in (LetExpr(exprs, body), xs)
     | Token(COMMA, _)::xs -> loop xs exprs
     | _ ->  raise @@ ParseError("Invalid let synatx. Expected 'in' or ','") in
   loop tokens []
