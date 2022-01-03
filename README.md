@@ -1,2 +1,3 @@
-## L1
-Just messing around with Ocaml to see if I like it
+## Flax Functional
+
+A small fuctional language compiler to work on implementing transformations and code gen.
