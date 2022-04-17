@@ -1,8 +1,10 @@
 (executables
-  (names program)
-  (libraries lib)
-  (preprocess (pps ppx_jane ppx_deriving.show)))
-  
- (env
-  (dev
-    (flags (:standard -warn-error -A))))
+ (names program)
+ (libraries lib)
+ (preprocess
+  (pps ppx_jane ppx_deriving.show)))
+
+(env
+ (dev
+  (flags
+   (:standard -warn-error -A))))

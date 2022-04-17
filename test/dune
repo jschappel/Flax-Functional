@@ -1,8 +1,10 @@
 ;; see https://github.com/gildor478/ounit/tree/master/examples for test examples
+
 (tests
  (names lexerTest parserTest structures interpreterTest)
  (libraries ounit2 lib))
 
 (env
-(dev
-  (flags (:standard -warn-error -A))))
+ (dev
+  (flags
+   (:standard -warn-error -A))))

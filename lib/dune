@@ -1,8 +1,10 @@
 (library
-  (public_name lib)
-  (libraries core)
-  (preprocess (pps ppx_jane ppx_deriving.show ppx_deriving.eq)))
-  
- (env
-  (dev
-    (flags (:standard -warn-error -A))))
+ (public_name lib)
+ (libraries core)
+ (preprocess
+  (pps ppx_jane ppx_deriving.show ppx_deriving.eq)))
+
+(env
+ (dev
+  (flags
+   (:standard -warn-error -A))))

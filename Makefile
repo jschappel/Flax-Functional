@@ -17,3 +17,13 @@ clean:
 
 install:
 	dune build
+
+install-deps: 
+	$(opam install   \
+		ounit2         \
+		core           \
+		ppx_deriving   \
+		ocamlformat)
+
+fmt:
+	dune build @fmt --auto-promote
