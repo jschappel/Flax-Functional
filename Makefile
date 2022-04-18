@@ -1,7 +1,7 @@
 exe: main.exe
 	$(dune build bin/program.exe)
-	rlwrap dune exec bin/program.exe
-	$(echo "")
+	dune exec bin/program.exe
+
 
 
 main.exe: install
@@ -27,3 +27,6 @@ install-deps:
 
 fmt:
 	dune build @fmt --auto-promote
+
+init:
+	$(shell eval $(opam env))
