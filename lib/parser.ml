@@ -46,12 +46,12 @@ and parse_let_expr tokens isLetRec =
     let exprs = a @ [ exp ] in
     (* *)
     match xs with
-    | Token (IN, _) :: xs | Token (COMMA, _) :: Token (IN, _) :: xs ->
+    | Token (IN, _) :: xs | Token (SEMICOLON, _) :: Token (IN, _) :: xs ->
         (* Allow for trailing comma on let exprs *)
         let body, xs = parse_expression_helper xs in
         if isLetRec then (LetRecExpr (exprs, body), xs)
         else (LetExpr (exprs, body), xs)
-    | Token (COMMA, _) :: xs -> loop xs exprs
+    | Token (SEMICOLON, _) :: xs -> loop xs exprs
     | _ -> raise @@ ParseError "Invalid let synatx. Expected 'in' or ','"
   in
   loop tokens []

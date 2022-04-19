@@ -7,7 +7,7 @@ let token_list_to_string l =
 
 let operators _ =
   assert_equal ~printer:token_list_to_string
-    (lexProgram "+ - * / ( ) , = => == > < >= <= != \t \n +")
+    (lexProgram "+ - * / ( ) , ; = => == > < >= <= != \t \n +")
     [
       Token (PLUS, 1);
       Token (MINUS, 1);
@@ -16,6 +16,7 @@ let operators _ =
       Token (LEFT_PAREN, 1);
       Token (RIGHT_PAREN, 1);
       Token (COMMA, 1);
+      Token (SEMICOLON, 1);
       Token (EQ, 1);
       Token (ARROW, 1);
       Token (EQ_EQ, 1);

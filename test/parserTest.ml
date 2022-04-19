@@ -89,20 +89,20 @@ let let_expression1 _ =
 
 let let_expression2 _ =
   assert_equal ~printer:show_expression
-    (parse_expression @@ lexProgram "let x = 10, y = 20 in x + y")
+    (parse_expression @@ lexProgram "let x = 10; y = 20 in x + y")
     (LetExpr
        ( [ ("x", LiteralExpr (Num 10.0)); ("y", LiteralExpr (Num 20.0)) ],
          BinaryExpr (PLUS, LiteralExpr (Ident "x"), LiteralExpr (Ident "y")) ))
 
 let let_expression3 _ =
   assert_equal ~printer:show_expression
-    (parse_expression @@ lexProgram "let x = 10, in x")
+    (parse_expression @@ lexProgram "let x = 10; in x")
     (LetExpr ([ ("x", LiteralExpr (Num 10.0)) ], LiteralExpr (Ident "x")))
 
 let let_expression4 _ =
   assert_equal ~printer:show_expression
     (parse_expression
-    @@ lexProgram "let x = let xx = 10 in xx + 1, y = 20 in x + y")
+    @@ lexProgram "let x = let xx = 10 in xx + 1; y = 20 in x + y")
     (LetExpr
        ( [
            ( "x",
@@ -117,7 +117,7 @@ let let_expression4 _ =
 let letrec_expression _ =
   assert_equal ~printer:show_expression
     (parse_expression
-    @@ lexProgram "letrec add = fn x, y => x + y, z = 10 in add(4,5)")
+    @@ lexProgram "letrec add = fn x, y => x + y; z = 10 in add(4,5)")
     (LetRecExpr
        ( [
            ( "add",

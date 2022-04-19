@@ -72,6 +72,7 @@ let lexProgram prog =
         | '*' -> Token (STAR, line) :: lexLine xs line
         | '+' -> Token (PLUS, line) :: lexLine xs line
         | ',' -> Token (COMMA, line) :: lexLine xs line
+        | ';' -> Token (SEMICOLON, line) :: lexLine xs line
         | '-' ->
             let tt, size = lex_minus txt line in
             let xs = List.drop txt size in

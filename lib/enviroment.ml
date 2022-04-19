@@ -2,13 +2,19 @@ module type Env = sig
   open Base
   open CoreProgram
 
-  type env = EmptyEnv | ExtEnv of pair list * env
-  and pair = string * value
+  type identifier = string
+
+  type env =
+    | EmptyEnv
+    | ExtEnv of pair list * env
+    | ExtEnvRec of identifier * identifier * expression * env
+
+  and pair = identifier * value
 
   and value =
     | NumVal of float
     | BoolVal of bool
-    | ProcVal of string list * expression * env
+    | ProcVal of identifier list * expression * env
   [@@deriving show, eq]
 
   (* returns a empty env *)
@@ -25,14 +31,19 @@ module Enviroment : Env = struct
   open Base
   open CoreProgram
 
-  type env = EmptyEnv | ExtEnv of pair list * env
-  and pair = string * value
+  type env =
+    | EmptyEnv
+    | ExtEnv of pair list * env
+    | ExtEnvRec of identifier * identifier * expression * env
+
+  and pair = identifier * value
 
   and value =
     | NumVal of float
     | BoolVal of bool
-    | ProcVal of string list * expression * env
-  [@@deriving show, eq]
+    | ProcVal of identifier list * expression * env
+
+  and identifier = string [@@deriving show, eq]
 
   let empty_env = EmptyEnv
 
@@ -40,11 +51,16 @@ module Enviroment : Env = struct
     | EmptyEnv -> ExtEnv (p, EmptyEnv)
     | e -> ExtEnv (p, e)
 
-  let rec get_env_value target = function
+  let rec get_env_value target env =
+    match env with
     | EmptyEnv -> None
     | ExtEnv (pairs, ext) -> (
         let comparator (k, _) = equal_string k target in
         match List.find pairs ~f:comparator with
         | Some (_, v) -> Some v
         | None -> get_env_value target ext)
+    | ExtEnvRec (fname, bound_var, fbody, saved_env) ->
+        if equal_string target fname then
+          Some (ProcVal ([ bound_var ], fbody, env))
+        else get_env_value target saved_env
 end

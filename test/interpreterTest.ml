@@ -41,8 +41,15 @@ let let_expr _ =
 
 let multi_let_expr _ =
   assert_equal ~printer:show_value
-    (run "let x = 20, y = 30 in x > y")
+    (run "let x = 20; y = 30 in x > y")
     (BoolVal false)
+
+let letrec_expr _ =
+  todo "Sill Need to impliment letrec";
+  assert_equal ~printer:show_value
+    (run
+       "letrec fact = fn x => if x <= 0 then 1 else x * fact(n - 1) in fact(5)")
+    (NumVal 120.0)
 
 let and_expr _ =
   assert_equal ~printer:show_value (run "true and false") (BoolVal false)
@@ -90,6 +97,7 @@ let suite =
          "Add" >:: and_expr;
          "Or" >:: or_expr;
          "Let Expression" >:: let_expr;
+         "Letrec Expression" >:: letrec_expr;
          "Multi Let Expression" >:: multi_let_expr;
          "Function No Args" >:: func_no_args;
          "Function Single Args" >:: func_arg;
