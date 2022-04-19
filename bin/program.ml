@@ -3,7 +3,8 @@ open Lib
 
 let run_env line =
   try
-    value_to_string @@ value_of (parse_expression @@ lexProgram line) EmptyEnv
+    Enviroment.show_value
+    @@ value_of (parse_expression @@ lexProgram line) EmptyEnv
   with
   | Failure msg -> msg
   | ParseError e -> e

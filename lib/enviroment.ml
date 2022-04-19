@@ -1,32 +1,50 @@
-open Base
-open CoreProgram
+module type Env = sig
+  open Base
+  open CoreProgram
 
-type enviroment = EmptyEnv | ExtEnv of pair list * enviroment
-and pair = string * value
+  type env = EmptyEnv | ExtEnv of pair list * env
+  and pair = string * value
 
-and value =
-  | NumVal of float
-  | BoolVal of bool
-  | ProcVal of string list * expression * enviroment
-[@@deriving show, eq]
+  and value =
+    | NumVal of float
+    | BoolVal of bool
+    | ProcVal of string list * expression * env
+  [@@deriving show, eq]
 
-let rec get_value env value =
-  match env with
-  | EmptyEnv -> None
-  | ExtEnv (pairs, ext_env) -> (
-      let comparator (k, _) = equal_string k value in
-      match List.find pairs ~f:comparator with
-      | Some (_, v) -> Some v
-      | None -> get_value ext_env value)
+  (* returns a empty env *)
+  val empty_env : env
 
-let add_value env pair =
-  match env with
-  | EmptyEnv -> ExtEnv ([ pair ], EmptyEnv)
-  | ExtEnv (l, env) -> ExtEnv (pair :: l, env)
+  (* Extends the enviroment with the given value*)
+  val ext_env : pair list -> env -> env
 
-let ext_env env pair = ExtEnv (pair, env)
+  (* Trys the find a value that is in a env *)
+  val get_env_value : string -> env -> value option
+end
 
-let value_to_string = function
-  | NumVal n -> Float.to_string n
-  | BoolVal b -> Bool.to_string b
-  | ProcVal (_, _, _) -> "<func " ^ ">"
+module Enviroment : Env = struct
+  open Base
+  open CoreProgram
+
+  type env = EmptyEnv | ExtEnv of pair list * env
+  and pair = string * value
+
+  and value =
+    | NumVal of float
+    | BoolVal of bool
+    | ProcVal of string list * expression * env
+  [@@deriving show, eq]
+
+  let empty_env = EmptyEnv
+
+  let ext_env p = function
+    | EmptyEnv -> ExtEnv (p, EmptyEnv)
+    | e -> ExtEnv (p, e)
+
+  let rec get_env_value target = function
+    | EmptyEnv -> None
+    | ExtEnv (pairs, ext) -> (
+        let comparator (k, _) = equal_string k target in
+        match List.find pairs ~f:comparator with
+        | Some (_, v) -> Some v
+        | None -> get_env_value target ext)
+end

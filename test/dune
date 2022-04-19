@@ -1,7 +1,7 @@
 ;; see https://github.com/gildor478/ounit/tree/master/examples for test examples
 
 (tests
- (names lexerTest parserTest structures interpreterTest)
+ (names lexerTest parserTest enviromentTest interpreterTest)
  (libraries ounit2 lib))
 
 (env

@@ -1,6 +1,7 @@
 open OUnit2
 open TestHelpers
 open Lib
+open Lib.Enviroment
 
 let run (p : string) : value =
   EmptyEnv |> value_of @@ parse_expression @@ lexProgram p
@@ -121,7 +122,7 @@ let env1 =
       ExtEnv ([ ("xx", NumVal 10.0); ("yy", NumVal 500.0) ], EmptyEnv) )
 
 let free_var_env1 _ =
-  assert_equal ~printer:show_enviroment
+  assert_equal ~printer:show_env
     (ExtEnv ([ ("x", NumVal 10.0); ("yy", NumVal 500.0) ], EmptyEnv))
     (make_free_var_env env1 (parse "fn xx, y => x + y + xx + yy") [])
 

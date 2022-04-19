@@ -1,6 +1,6 @@
 open CoreProgram
 open Token
-open Enviroment
+open Enviroment.Enviroment
 
 exception InterpreterError of string
 
@@ -29,15 +29,15 @@ let rec occurs_free (var : string) (exp : expression) : bool =
   | _ -> false
 
 (* Creates the optimized enviroment onyl containing the free vars*)
-let rec make_free_var_env (env : enviroment) (exp : expression)
-    (acc : pair list) : enviroment =
+let rec make_free_var_env (env : env) (exp : expression) (acc : pair list) : env
+    =
   match env with
-  | EmptyEnv -> ext_env EmptyEnv acc
+  | EmptyEnv -> ext_env acc EmptyEnv
   | ExtEnv (l, ext_env) ->
       let free_vars = acc @ List.filter (fun (s, _) -> occurs_free s exp) l in
       make_free_var_env ext_env exp free_vars
 
-let rec value_of (exp : expression) (env : enviroment) : value =
+let rec value_of (exp : expression) (env : env) : value =
   match exp with
   | BinaryExpr (op, exp1, exp2) -> value_of_binary op exp1 exp2 env
   | LiteralExpr inner -> value_of_literal inner env
@@ -49,7 +49,7 @@ let rec value_of (exp : expression) (env : enviroment) : value =
       let val_list =
         List.map (fun (s, exp) -> (s, value_of exp env)) exp_list
       in
-      value_of body @@ ext_env env val_list
+      value_of body @@ ext_env val_list env
   | FuncExpr (params, body) ->
       let new_env = make_free_var_env env exp [] in
       ProcVal (params, body, new_env)
@@ -70,7 +70,7 @@ and apply_procedure vals name = function
             ^ ", Given: " ^ Int.to_string vals_len)
       else
         let val_list = List.map2 (fun s v -> (s, v)) params vals in
-        value_of body @@ ext_env env val_list
+        value_of body @@ ext_env val_list env
   | _ ->
       raise
       @@ InterpreterError ("Unable to find <func " ^ name ^ "> in enviroment")
@@ -114,7 +114,7 @@ and value_of_literal exp env =
   | Num n -> NumVal n
   | Bool n -> BoolVal n
   | Ident i -> (
-      match get_value env i with
+      match get_env_value i env with
       | Some v -> v
       | None ->
           raise @@ InterpreterError ("Value " ^ i ^ " not found in enviroment"))
