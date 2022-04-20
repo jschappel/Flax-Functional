@@ -227,6 +227,8 @@ and parse_literal_exp = function
   | Token (tt, line) :: _ ->
       raise
       @@ ParseError
-           ("Invalid Token supplied at line:" ^ Int.to_string line ^ " .Given: "
-          ^ show_tokenType tt)
+           ("Invalid Token supplied at line:"
+           ^ Int.to_string line
+           ^ " .Given: "
+           ^ show_tokenType tt)
   | [] -> raise @@ ParseError "Unreachable"

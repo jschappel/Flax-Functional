@@ -67,8 +67,10 @@ and apply_procedure vals name = function
       if param_len != vals_len then
         raise
         @@ InterpreterError
-             ("Arity mismatch. Expected " ^ Int.to_string param_len
-            ^ ", Given: " ^ Int.to_string vals_len)
+             ("Arity mismatch. Expected "
+             ^ Int.to_string param_len
+             ^ ", Given: "
+             ^ Int.to_string vals_len)
       else
         let val_list = List.map2 (fun s v -> (s, v)) params vals in
         value_of body @@ ext_env val_list env
