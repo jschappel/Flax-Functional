@@ -2,6 +2,7 @@
 
 (tests
  (names lexerTest parserTest enviromentTest interpreterTest)
+ (action (run %{test} -ci=true))
  (libraries ounit2 lib))
 
 (env
