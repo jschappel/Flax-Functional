@@ -116,18 +116,25 @@ let let_expression4 _ =
 
 let letrec_expression _ =
   assert_equal ~printer:show_expression
-    (parse_expression
-    @@ lexProgram "letrec add = fn x, y => x + y; z = 10 in add(4,5)")
     (LetRecExpr
        ( [
            ( "add",
-             FuncExpr
-               ( [ "x"; "y" ],
-                 BinaryExpr
-                   (PLUS, LiteralExpr (Ident "x"), LiteralExpr (Ident "y")) ) );
-           ("z", LiteralExpr (Num 10.0));
+             [ "x"; "y" ],
+             BinaryExpr (PLUS, LiteralExpr (Ident "x"), LiteralExpr (Ident "y"))
+           );
+           ( "sub",
+             [ "xx"; "yy" ],
+             BinaryExpr
+               (MINUS, LiteralExpr (Ident "xx"), LiteralExpr (Ident "yy")) );
          ],
          CallExpr ("add", [ LiteralExpr (Num 4.0); LiteralExpr (Num 5.0) ]) ))
+    (parse_expression
+    @@ lexProgram
+         "letrec\n\
+         \           add(x, y) => x + y;\n\
+         \           sub(xx, yy) => xx - yy\n\
+         \         in\n\
+         \           add(4,5)")
 
 let lambda_single _ =
   assert_equal ~printer:show_expression

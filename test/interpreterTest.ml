@@ -48,7 +48,10 @@ let letrec_expr _ =
   todo "Sill Need to impliment letrec";
   assert_equal ~printer:show_value
     (run
-       "letrec fact = fn x => if x <= 0 then 1 else x * fact(n - 1) in fact(5)")
+       "letrec\n\n\
+       \          fact = fn x => if x <= 0 then 1 else x * fact(n - 1)\n\n\
+       \        in\n\n\
+       \          fact(5)")
     (NumVal 120.0)
 
 let and_expr _ =

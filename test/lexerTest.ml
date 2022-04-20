@@ -69,6 +69,46 @@ let identifiers _ =
       Token (IDENTIFIER "someValue", 1);
     ]
 
+let lex_letrec _ =
+  assert_equal ~printer:token_list_to_string
+    [
+      Token (LETREC, 1);
+      Token (IDENTIFIER "add", 2);
+      Token (LEFT_PAREN, 2);
+      Token (IDENTIFIER "x", 2);
+      Token (COMMA, 2);
+      Token (IDENTIFIER "y", 2);
+      Token (RIGHT_PAREN, 2);
+      Token (ARROW, 2);
+      Token (IDENTIFIER "x", 2);
+      Token (PLUS, 2);
+      Token (IDENTIFIER "y", 2);
+      Token (SEMICOLON, 2);
+      Token (IDENTIFIER "sub", 3);
+      Token (LEFT_PAREN, 3);
+      Token (IDENTIFIER "xx", 3);
+      Token (COMMA, 3);
+      Token (IDENTIFIER "yy", 3);
+      Token (RIGHT_PAREN, 3);
+      Token (ARROW, 3);
+      Token (IDENTIFIER "xx", 3);
+      Token (MINUS, 3);
+      Token (IDENTIFIER "yy", 3);
+      Token (IN, 4);
+      Token (IDENTIFIER "add", 5);
+      Token (LEFT_PAREN, 5);
+      Token (NUMBER 4.0, 5);
+      Token (COMMA, 5);
+      Token (NUMBER 5.0, 5);
+      Token (RIGHT_PAREN, 5);
+    ]
+    (lexProgram
+       "letrec\n\
+       \        add(x, y) => x + y;\n\
+       \        sub(xx, yy) => xx - yy\n\
+       \      in\n\
+       \       add(4,5)")
+
 let suite =
   "Tokens"
   >::: [
@@ -78,6 +118,7 @@ let suite =
          "Strings" >:: strings;
          "Reserved Identifiers" >:: reserved_identifiers;
          "Identifiers" >:: identifiers;
+         "Others" >:: lex_letrec;
        ]
 
 let () = run_test_tt_main suite

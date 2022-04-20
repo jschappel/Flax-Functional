@@ -36,6 +36,7 @@ let rec make_free_var_env (env : env) (exp : expression) (acc : pair list) : env
   | ExtEnv (l, ext_env) ->
       let free_vars = acc @ List.filter (fun (s, _) -> occurs_free s exp) l in
       make_free_var_env ext_env exp free_vars
+  | _ -> unimplimented ()
 
 let rec value_of (exp : expression) (env : env) : value =
   match exp with
@@ -53,10 +54,7 @@ let rec value_of (exp : expression) (env : env) : value =
   | FuncExpr (params, body) ->
       let new_env = make_free_var_env env exp [] in
       ProcVal (params, body, new_env)
-  | LetRecExpr (exp_list, body) -> 
-    (* let new_env = ext_env [] *)
-    
-    unimplimented ()
+  | LetRecExpr (exp_list, body) -> unimplimented ()
   | CallExpr (name, params) ->
       let rands = List.map (fun v -> value_of v env) params in
       let rator = value_of (LiteralExpr (Ident name)) env in

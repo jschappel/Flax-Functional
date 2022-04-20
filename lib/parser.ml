@@ -9,8 +9,8 @@ let rec parse_expression (tokens : token list) : expression =
 
 and parse_expression_helper = function
   | Token (IF, _) :: xs -> parse_if_expr xs
-  | Token (LET, _) :: xs -> parse_let_expr xs false
-  | Token (LETREC, _) :: xs -> parse_let_expr xs true
+  | Token (LET, _) :: xs -> parse_let_expr xs
+  | Token (LETREC, _) :: xs -> parse_letrec_expr xs
   | Token (FUN, _) :: xs -> parse_fn_expr xs
   | tokens -> parse_or_expr tokens
 
@@ -32,7 +32,7 @@ and parse_fn_expr tokens =
       raise
       @@ ParseError "Invalid lambda synatx. Expected '=>' after parameters"
 
-and parse_let_expr tokens isLetRec =
+and parse_let_expr tokens =
   let parse_single_let = function
     | Token (IDENTIFIER i, _) :: Token (EQ, _) :: xs ->
         let exp1, xs = parse_expression_helper xs in
@@ -49,12 +49,59 @@ and parse_let_expr tokens isLetRec =
     | Token (IN, _) :: xs | Token (SEMICOLON, _) :: Token (IN, _) :: xs ->
         (* Allow for trailing comma on let exprs *)
         let body, xs = parse_expression_helper xs in
-        if isLetRec then (LetRecExpr (exprs, body), xs)
-        else (LetExpr (exprs, body), xs)
+        (LetExpr (exprs, body), xs)
     | Token (SEMICOLON, _) :: xs -> loop xs exprs
     | _ -> raise @@ ParseError "Invalid let synatx. Expected 'in' or ','"
   in
   loop tokens []
+
+and parse_letrec_expr tokens =
+  let parse_string_args l =
+    let rec helper l acc =
+      match l with
+      | Token (IDENTIFIER arg, _) :: xs -> helper xs @@ (arg :: acc)
+      | Token (COMMA, _) :: xs -> helper xs acc
+      | Token (RIGHT_PAREN, _) :: xs -> (List.rev acc, xs)
+      | _ ->
+          raise
+          @@ ParseError "Invalid letrec synatx. Expected either ',' or ')'"
+    in
+    match l with
+    | Token (LEFT_PAREN, _) :: xs -> helper xs []
+    | _ -> raise @@ ParseError "Invalid letrec synatx. Expected either '('"
+  in
+
+  (* name(args , ...) => body ; *)
+  let parse_single_letrec = function
+    | Token (IDENTIFIER fname, _) :: xs -> (
+        let args, xs = parse_string_args xs in
+        match xs with
+        | Token (ARROW, _) :: xs ->
+            let body, xs = parse_expression_helper xs in
+            ((fname, args, body), xs)
+        | _ ->
+            raise
+            @@ ParseError "Invalid letrec synatx. Expected '=>' after func args"
+        )
+    | _ ->
+        raise
+        @@ ParseError "Invalid letrec synatx. Expected '(' after func name"
+  in
+
+  let rec loop tokens acc =
+    let letrec, xs = parse_single_letrec tokens in
+    match xs with
+    | Token (SEMICOLON, _) :: xs -> loop xs @@ acc @ [ letrec ]
+    | Token (IN, _) :: xs -> (acc @ [ letrec ], xs)
+    | _ ->
+        raise
+        @@ ParseError
+             "Invalid letrec synatx. Expected 'in' or ';' after function \
+              declaration"
+  in
+  let letrecs, xs = loop tokens [] in
+  let body, xs = parse_expression_helper xs in
+  (LetRecExpr (letrecs, body), xs)
 
 and parse_if_expr (tokens : token list) : expression * token list =
   let cond_expr, xs = parse_expression_helper tokens in
