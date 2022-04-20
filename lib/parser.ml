@@ -21,7 +21,7 @@ and parse_fn_expr tokens =
     | Token (IDENTIFIER i, _) :: Token (COMMA, _) :: xs ->
         parse_args xs @@ acc @ [ i ]
     | Token (IDENTIFIER i, _) :: xs -> (acc @ [ i ], xs)
-    | _ -> raise @@ ParseError "Invalid lambda synatx. Expected identifier"
+    | _ -> raise @@ ParseError "Invalid lambda syntax. Expected identifier"
   in
   let args, xs = parse_args tokens [] in
   match xs with
@@ -30,7 +30,7 @@ and parse_fn_expr tokens =
       (FuncExpr (args, body), xs)
   | _ ->
       raise
-      @@ ParseError "Invalid lambda synatx. Expected '=>' after parameters"
+      @@ ParseError "Invalid lambda syntax. Expected '=>' after parameters"
 
 and parse_let_expr tokens =
   let parse_single_let = function
@@ -39,7 +39,7 @@ and parse_let_expr tokens =
         ((i, exp1), xs)
     | _ ->
         raise
-        @@ ParseError "Invalid let synatx. Expected identifier follwoed by '='"
+        @@ ParseError "Invalid let syntax. Expected identifier follwoed by '='"
   in
   let rec loop l a =
     let exp, xs = parse_single_let l in
@@ -51,7 +51,7 @@ and parse_let_expr tokens =
         let body, xs = parse_expression_helper xs in
         (LetExpr (exprs, body), xs)
     | Token (SEMICOLON, _) :: xs -> loop xs exprs
-    | _ -> raise @@ ParseError "Invalid let synatx. Expected 'in' or ','"
+    | _ -> raise @@ ParseError "Invalid let syntax. Expected 'in' or ','"
   in
   loop tokens []
 
@@ -64,11 +64,11 @@ and parse_letrec_expr tokens =
       | Token (RIGHT_PAREN, _) :: xs -> (List.rev acc, xs)
       | _ ->
           raise
-          @@ ParseError "Invalid letrec synatx. Expected either ',' or ')'"
+          @@ ParseError "Invalid letrec syntax. Expected either ',' or ')'"
     in
     match l with
     | Token (LEFT_PAREN, _) :: xs -> helper xs []
-    | _ -> raise @@ ParseError "Invalid letrec synatx. Expected either '('"
+    | _ -> raise @@ ParseError "Invalid letrec syntax. Expected ')'"
   in
 
   (* name(args , ...) => body ; *)
@@ -81,11 +81,11 @@ and parse_letrec_expr tokens =
             ((fname, args, body), xs)
         | _ ->
             raise
-            @@ ParseError "Invalid letrec synatx. Expected '=>' after func args"
+            @@ ParseError "Invalid letrec syntax. Expected '=>' after func args"
         )
     | _ ->
         raise
-        @@ ParseError "Invalid letrec synatx. Expected '(' after func name"
+        @@ ParseError "Invalid letrec syntax. Expected '(' after func name"
   in
 
   let rec loop tokens acc =
@@ -96,7 +96,7 @@ and parse_letrec_expr tokens =
     | _ ->
         raise
         @@ ParseError
-             "Invalid letrec synatx. Expected 'in' or ';' after function \
+             "Invalid letrec syntax. Expected 'in' or ';' after function \
               declaration"
   in
   let letrecs, xs = loop tokens [] in
@@ -207,7 +207,7 @@ and parse_call_expr tokens =
     match xs with
     | Token (COMMA, _) :: xs -> parse_args xs @@ acc @ [ exp ]
     | Token (RIGHT_PAREN, _) :: xs -> (acc @ [ exp ], xs)
-    | _ -> raise @@ ParseError "Invalid call synatx. Expected either ',' or ')'"
+    | _ -> raise @@ ParseError "Invalid call syntax. Expected either ',' or ')'"
   in
   match tokens with
   | Token (IDENTIFIER i, _)

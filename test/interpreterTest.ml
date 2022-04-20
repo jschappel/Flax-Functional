@@ -45,13 +45,13 @@ let multi_let_expr _ =
     (BoolVal false)
 
 let letrec_expr _ =
-  todo "Sill Need to impliment letrec";
+  (* todo "Sill Need to impliment letrec"; *)
   assert_equal ~printer:show_value
     (run
-       "letrec\n\n\
-       \          fact = fn x => if x <= 0 then 1 else x * fact(n - 1)\n\n\
-       \        in\n\n\
-       \          fact(5)")
+       "letrec
+       \ fact(x) => if x <= 0 then 1 else x * fact(x - 1)
+       \ in
+       \ fact(5)")
     (NumVal 120.0)
 
 let and_expr _ =
@@ -109,6 +109,7 @@ let suite =
        ]
 
 (* Occures Free Checks Below *)
+(* TODO(jschappel): move elsewhere *)
 let occurs_free1 _ = assert_false @@ occurs_free "x" (parse "fn x, y => x + z")
 let occurs_free2 _ = assert_true @@ occurs_free "z" (parse "fn x, y => x + z")
 let occurs_free3 _ = assert_true @@ occurs_free "x" (parse "x + y")
@@ -125,7 +126,7 @@ let occurs_free6 _ =
   @@ occurs_free "z" (parse "let add = fn z, y => x + y + z in add(10, 20)")
 
 let occurs_free7 _ =
-  assert_true @@ occurs_free "z" (parse "let x = 20, y = 20 + z in x + y")
+  assert_true @@ occurs_free "z" (parse "let x = 20; y = 20 + z in x + y")
 
 let env1 =
   ExtEnv
