@@ -7,7 +7,7 @@ let token_list_to_string l =
 
 let operators _ =
   assert_equal ~printer:token_list_to_string
-    (lexProgram "+ - * / ( ) , ; = => == > < >= <= != \t \n +")
+    (lex_line "+ - * / ( ) , ; = => == > < >= <= != \t \n +")
     [
       Token (PLUS, 1);
       Token (MINUS, 1);
@@ -29,22 +29,21 @@ let operators _ =
     ]
 
 let numbers _ =
-  assert_equal ~printer:token_list_to_string
-    (lexProgram "1 10 100.123")
+  assert_equal ~printer:token_list_to_string (lex_line "1 10 100.123")
     [ Token (NUMBER 1.0, 1); Token (NUMBER 10.0, 1); Token (NUMBER 100.123, 1) ]
 
 let negative_numbers _ =
-  assert_equal ~printer:token_list_to_string (lexProgram "-10 -10.0")
+  assert_equal ~printer:token_list_to_string (lex_line "-10 -10.0")
     [ Token (NUMBER (-10.0), 1); Token (NUMBER (-10.0), 1) ]
 
 let strings _ =
   assert_equal ~printer:token_list_to_string
-    (lexProgram "\"String\" \"josh\"")
+    (lex_line "\"String\" \"josh\"")
     [ Token (STRING "String", 1); Token (STRING "josh", 1) ]
 
 let reserved_identifiers _ =
   assert_equal ~printer:token_list_to_string
-    (lexProgram "fn let letrec in if then else and or true false not")
+    (lex_line "fn let letrec in if then else and or true false not")
     [
       Token (FUN, 1);
       Token (LET, 1);
@@ -62,7 +61,7 @@ let reserved_identifiers _ =
 
 let identifiers _ =
   assert_equal ~printer:token_list_to_string
-    (lexProgram "x xs someValue")
+    (lex_line "x xs someValue")
     [
       Token (IDENTIFIER "x", 1);
       Token (IDENTIFIER "xs", 1);
@@ -102,7 +101,7 @@ let lex_letrec _ =
       Token (NUMBER 5.0, 5);
       Token (RIGHT_PAREN, 5);
     ]
-    (lexProgram
+    (lex_line
        "letrec\n\
        \        add(x, y) => x + y;\n\
        \        sub(xx, yy) => xx - yy\n\

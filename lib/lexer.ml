@@ -3,6 +3,9 @@ open Token
 
 exception LexError of string * int
 
+type line = string
+type program = line list
+
 (* Reserved Identifiers *)
 let map =
   Map.of_alist_exn
@@ -60,53 +63,63 @@ let lex_minus (txt : char list) (line : int) : tokenType * int =
   | '-' :: _ -> (MINUS, 1)
   | _ -> raise @@ LexError ("Unreachable", line)
 
-let lexProgram prog =
-  let rec lexLine txt line =
+let lex_line ?line_num txt =
+  let line = match line_num with None -> 1 | Some l -> l in
+  let rec lex_line_aux txt line =
     match txt with
     | [] -> []
     | x :: xs -> (
         match x with
-        | '(' -> Token (LEFT_PAREN, line) :: lexLine xs line
-        | ')' -> Token (RIGHT_PAREN, line) :: lexLine xs line
-        | '.' -> Token (DOT, line) :: lexLine xs line
-        | '*' -> Token (STAR, line) :: lexLine xs line
-        | '+' -> Token (PLUS, line) :: lexLine xs line
-        | ',' -> Token (COMMA, line) :: lexLine xs line
-        | ';' -> Token (SEMICOLON, line) :: lexLine xs line
+        | '(' -> Token (LEFT_PAREN, line) :: lex_line_aux xs line
+        | ')' -> Token (RIGHT_PAREN, line) :: lex_line_aux xs line
+        | '.' -> Token (DOT, line) :: lex_line_aux xs line
+        | '*' -> Token (STAR, line) :: lex_line_aux xs line
+        | '+' -> Token (PLUS, line) :: lex_line_aux xs line
+        | ',' -> Token (COMMA, line) :: lex_line_aux xs line
+        | ';' -> Token (SEMICOLON, line) :: lex_line_aux xs line
         | '-' ->
             let tt, size = lex_minus txt line in
             let xs = List.drop txt size in
-            Token (tt, line) :: lexLine xs line
-        | '/' -> Token (SLASH, line) :: lexLine xs line
+            Token (tt, line) :: lex_line_aux xs line
+        | '/' -> Token (SLASH, line) :: lex_line_aux xs line
         | '=' when equal_option Char.equal (List.hd xs) (Some '>') ->
-            Token (ARROW, line) :: lexLine (List.drop xs 1) line
+            Token (ARROW, line) :: lex_line_aux (List.drop xs 1) line
         | '=' when equal_option Char.equal (List.hd xs) (Some '=') ->
-            Token (EQ_EQ, line) :: lexLine (List.drop xs 1) line
-        | '=' -> Token (EQ, line) :: lexLine xs line
+            Token (EQ_EQ, line) :: lex_line_aux (List.drop xs 1) line
+        | '=' -> Token (EQ, line) :: lex_line_aux xs line
         | '>' when equal_option Char.equal (List.hd xs) (Some '=') ->
-            Token (GT_EQ, line) :: lexLine (List.drop xs 1) line
-        | '>' -> Token (GT, line) :: lexLine xs line
+            Token (GT_EQ, line) :: lex_line_aux (List.drop xs 1) line
+        | '>' -> Token (GT, line) :: lex_line_aux xs line
         | '<' when equal_option Char.equal (List.hd xs) (Some '=') ->
-            Token (LT_EQ, line) :: lexLine (List.drop xs 1) line
-        | '<' -> Token (LT, line) :: lexLine xs line
+            Token (LT_EQ, line) :: lex_line_aux (List.drop xs 1) line
+        | '<' -> Token (LT, line) :: lex_line_aux xs line
         | '!' when equal_option Char.equal (List.hd xs) (Some '=') ->
-            Token (NOT_EQ, line) :: lexLine (List.drop xs 1) line
-        | '\n' -> lexLine xs @@ (line + 1)
+            Token (NOT_EQ, line) :: lex_line_aux (List.drop xs 1) line
+        | '\n' -> lex_line_aux xs @@ (line + 1)
         | '"' ->
             let s = lex_string xs in
             let xs = List.drop xs @@ (1 + String.length s) in
-            Token (STRING s, line) :: lexLine xs line
-        | ' ' | '\t' -> lexLine xs line
+            Token (STRING s, line) :: lex_line_aux xs line
+        | ' ' | '\t' -> lex_line_aux xs line
         | '0' .. '9' ->
             let num_str = lex_number txt line in
             let xs = List.drop txt @@ String.length num_str in
-            Token (NUMBER (float_of_string num_str), line) :: lexLine xs line
+            Token (NUMBER (float_of_string num_str), line)
+            :: lex_line_aux xs line
         | 'a' .. 'z' | 'A' .. 'Z' ->
             let len, tt = lex_identifier txt in
             let xs = List.drop txt len in
-            Token (tt, line) :: lexLine xs line
+            Token (tt, line) :: lex_line_aux xs line
         | _ ->
             let msg = Printf.sprintf "Invalid token %c" x in
             raise @@ LexError (msg, line))
   in
-  lexLine (String.to_list prog) 1
+
+  lex_line_aux (String.to_list txt) line
+
+let lex_program prog =
+  let rec lex_program_aux (line : int) = function
+    | [] -> []
+    | x :: xs -> lex_line ~line_num:line x @ lex_program_aux (line + 1) xs
+  in
+  lex_program_aux 1 prog

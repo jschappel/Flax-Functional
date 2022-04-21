@@ -36,7 +36,9 @@ let rec make_free_var_env (env : env) (exp : expression) (acc : pair list) : env
   | ExtEnv (l, ext_env) ->
       let free_vars = acc @ List.filter (fun (s, _) -> occurs_free s exp) l in
       make_free_var_env ext_env exp free_vars
-  | _ -> print_string "HERERE"; unimplimented ()
+  | _ ->
+      print_string "HERERE";
+      unimplimented ()
 
 let rec value_of (exp : expression) (env : env) : value =
   match exp with
@@ -54,8 +56,7 @@ let rec value_of (exp : expression) (env : env) : value =
   | FuncExpr (params, body) ->
       let new_env = make_free_var_env env exp [] in
       ProcVal (params, body, new_env)
-  | LetRecExpr (exp_list, body) -> 
-    value_of body @@ ext_env_rec exp_list env
+  | LetRecExpr (exp_list, body) -> value_of body @@ ext_env_rec exp_list env
   | CallExpr (name, params) ->
       let rands = List.map (fun v -> value_of v env) params in
       let rator = value_of (LiteralExpr (Ident name)) env in
@@ -92,6 +93,11 @@ and value_of_binary op exp1 exp2 env =
   | LT, NumVal n1, NumVal n2 -> BoolVal (n1 < n2)
   | GT_EQ, NumVal n1, NumVal n2 -> BoolVal (n1 >= n2)
   | LT_EQ, NumVal n1, NumVal n2 -> BoolVal (n1 <= n2)
+  | EQ_EQ, v1, v2 -> (
+      match (v1, v2) with
+      | NumVal n1, NumVal n2 -> BoolVal (n1 = n2)
+      | BoolVal b1, BoolVal b2 -> BoolVal (b1 = b2)
+      | _ -> BoolVal false)
   | OR, v1, v2 ->
       let t1 = is_truthy v1 in
       let t2 = is_truthy v2 in
@@ -121,4 +127,7 @@ and value_of_literal exp env =
       match get_env_value i env with
       | Some v -> v
       | None ->
-          raise @@ InterpreterError ("Value `" ^ i ^ "` not found in enviroment"))
+          raise @@ InterpreterError ("Value `" ^ i ^ "` not found in enviroment")
+      )
+
+let interperet_program exp = value_of exp EmptyEnv

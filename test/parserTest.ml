@@ -3,27 +3,27 @@ open Lib
 
 let addition _ =
   assert_equal ~printer:show_expression
-    (parse_expression @@ lexProgram "1 + 3")
+    (parse_expression @@ lex_line "1 + 3")
     (BinaryExpr (PLUS, LiteralExpr (Num 1.0), LiteralExpr (Num 3.0)))
 
 let subtraction _ =
   assert_equal ~printer:show_expression
-    (parse_expression @@ lexProgram "1 - 3")
+    (parse_expression @@ lex_line "1 - 3")
     (BinaryExpr (MINUS, LiteralExpr (Num 1.0), LiteralExpr (Num 3.0)))
 
 let multiplication _ =
   assert_equal ~printer:show_expression
-    (parse_expression @@ lexProgram "1 * 3")
+    (parse_expression @@ lex_line "1 * 3")
     (BinaryExpr (STAR, LiteralExpr (Num 1.0), LiteralExpr (Num 3.0)))
 
 let division _ =
   assert_equal ~printer:show_expression
-    (parse_expression @@ lexProgram "1 / 3")
+    (parse_expression @@ lex_line "1 / 3")
     (BinaryExpr (SLASH, LiteralExpr (Num 1.0), LiteralExpr (Num 3.0)))
 
 let mixed_math_operators _ =
   assert_equal ~printer:show_expression
-    (parse_expression @@ lexProgram "1 / 3 * 4 + 5 - 1")
+    (parse_expression @@ lex_line "1 / 3 * 4 + 5 - 1")
     (BinaryExpr
        ( MINUS,
          BinaryExpr
@@ -37,7 +37,7 @@ let mixed_math_operators _ =
 
 let logical_operators _ =
   assert_equal ~printer:show_expression
-    (parse_expression @@ lexProgram "true and false or true")
+    (parse_expression @@ lex_line "true and false or true")
     (BinaryExpr
        ( OR,
          BinaryExpr (AND, LiteralExpr (Bool true), LiteralExpr (Bool false)),
@@ -45,7 +45,7 @@ let logical_operators _ =
 
 let unary_expr _ =
   assert_equal ~printer:show_expression
-    (parse_expression @@ lexProgram "not true and not false")
+    (parse_expression @@ lex_line "not true and not false")
     (BinaryExpr
        ( AND,
          UnaryExpr (NOT, LiteralExpr (Bool true)),
@@ -53,7 +53,7 @@ let unary_expr _ =
 
 let equality _ =
   assert_equal ~printer:show_expression
-    (parse_expression @@ lexProgram "1 == 1 and 1 != 3")
+    (parse_expression @@ lex_line "1 == 1 and 1 != 3")
     (BinaryExpr
        ( AND,
          BinaryExpr (EQ_EQ, LiteralExpr (Num 1.0), LiteralExpr (Num 1.0)),
@@ -61,7 +61,7 @@ let equality _ =
 
 let comparison _ =
   assert_equal ~printer:show_expression
-    (parse_expression @@ lexProgram "1 > 1 and 1 < 3 or 1 >= 1 and 1 <= 3")
+    (parse_expression @@ lex_line "1 > 1 and 1 < 3 or 1 >= 1 and 1 <= 3")
     (BinaryExpr
        ( OR,
          BinaryExpr
@@ -76,7 +76,7 @@ let comparison _ =
 
 let if_expression _ =
   assert_equal ~printer:show_expression
-    (parse_expression @@ lexProgram "if 5 > 1 then true else false")
+    (parse_expression @@ lex_line "if 5 > 1 then true else false")
     (IfExpr
        ( BinaryExpr (GT, LiteralExpr (Num 5.0), LiteralExpr (Num 1.0)),
          LiteralExpr (Bool true),
@@ -84,25 +84,25 @@ let if_expression _ =
 
 let let_expression1 _ =
   assert_equal ~printer:show_expression
-    (parse_expression @@ lexProgram "let x = 10 in x")
+    (parse_expression @@ lex_line "let x = 10 in x")
     (LetExpr ([ ("x", LiteralExpr (Num 10.0)) ], LiteralExpr (Ident "x")))
 
 let let_expression2 _ =
   assert_equal ~printer:show_expression
-    (parse_expression @@ lexProgram "let x = 10; y = 20 in x + y")
+    (parse_expression @@ lex_line "let x = 10; y = 20 in x + y")
     (LetExpr
        ( [ ("x", LiteralExpr (Num 10.0)); ("y", LiteralExpr (Num 20.0)) ],
          BinaryExpr (PLUS, LiteralExpr (Ident "x"), LiteralExpr (Ident "y")) ))
 
 let let_expression3 _ =
   assert_equal ~printer:show_expression
-    (parse_expression @@ lexProgram "let x = 10; in x")
+    (parse_expression @@ lex_line "let x = 10; in x")
     (LetExpr ([ ("x", LiteralExpr (Num 10.0)) ], LiteralExpr (Ident "x")))
 
 let let_expression4 _ =
   assert_equal ~printer:show_expression
     (parse_expression
-    @@ lexProgram "let x = let xx = 10 in xx + 1; y = 20 in x + y")
+    @@ lex_line "let x = let xx = 10 in xx + 1; y = 20 in x + y")
     (LetExpr
        ( [
            ( "x",
@@ -129,7 +129,7 @@ let letrec_expression _ =
          ],
          CallExpr ("add", [ LiteralExpr (Num 4.0); LiteralExpr (Num 5.0) ]) ))
     (parse_expression
-    @@ lexProgram
+    @@ lex_line
          "letrec\n\
          \           add(x, y) => x + y;\n\
          \           sub(xx, yy) => xx - yy\n\
@@ -138,31 +138,31 @@ let letrec_expression _ =
 
 let lambda_single _ =
   assert_equal ~printer:show_expression
-    (parse_expression @@ lexProgram "fn x => x + 10")
+    (parse_expression @@ lex_line "fn x => x + 10")
     (FuncExpr
        ( [ "x" ],
          BinaryExpr (PLUS, LiteralExpr (Ident "x"), LiteralExpr (Num 10.0)) ))
 
 let lambda_mult _ =
   assert_equal ~printer:show_expression
-    (parse_expression @@ lexProgram "fn x, y => x + y")
+    (parse_expression @@ lex_line "fn x, y => x + y")
     (FuncExpr
        ( [ "x"; "y" ],
          BinaryExpr (PLUS, LiteralExpr (Ident "x"), LiteralExpr (Ident "y")) ))
 
 let empty_arg_call _ =
   assert_equal ~printer:show_expression
-    (parse_expression @@ lexProgram "x()")
+    (parse_expression @@ lex_line "x()")
     (CallExpr ("x", []))
 
 let single_arg_call _ =
   assert_equal ~printer:show_expression
-    (parse_expression @@ lexProgram "x(10)")
+    (parse_expression @@ lex_line "x(10)")
     (CallExpr ("x", [ LiteralExpr (Num 10.0) ]))
 
 let mult_arg_call _ =
   assert_equal ~printer:show_expression
-    (parse_expression @@ lexProgram "add(10, y + 20)")
+    (parse_expression @@ lex_line "add(10, y + 20)")
     (CallExpr
        ( "add",
          [

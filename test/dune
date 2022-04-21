@@ -1,8 +1,9 @@
 ;; see https://github.com/gildor478/ounit/tree/master/examples for test examples
 
 (tests
- (names lexerTest parserTest enviromentTest interpreterTest)
- (action (run %{test} -ci=true))
+ (names lexerTest parserTest enviromentTest interpreterTest testPrograms)
+ (action
+  (run %{test} -ci=true))
  (libraries ounit2 lib))
 
 (env

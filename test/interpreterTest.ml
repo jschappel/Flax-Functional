@@ -4,10 +4,10 @@ open Lib
 open Lib.Enviroment
 
 let run (p : string) : value =
-  EmptyEnv |> value_of @@ parse_expression @@ lexProgram p
+  EmptyEnv |> value_of @@ parse_expression @@ lex_line p
 
 let parse ?(debug = false) (s : string) : expression =
-  let e = parse_expression @@ lexProgram s in
+  let e = parse_expression @@ lex_line s in
   if debug then (
     print_endline @@ show_expression e;
     e)
@@ -48,10 +48,10 @@ let letrec_expr _ =
   (* todo "Sill Need to impliment letrec"; *)
   assert_equal ~printer:show_value
     (run
-       "letrec
-       \ fact(x) => if x <= 0 then 1 else x * fact(x - 1)
-       \ in
-       \ fact(5)")
+       "letrec\n\
+       \        fact(x) => if x <= 0 then 1 else x * fact(x - 1)\n\
+       \        in\n\
+       \        fact(5)")
     (NumVal 120.0)
 
 let and_expr _ =
