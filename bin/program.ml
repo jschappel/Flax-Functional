@@ -20,7 +20,7 @@ let run_file (path : string) =
       In_channel.input_lines file
       |> lex_program
       |> parse_expression
-      |> interperet_program
+      |> Transformations.CPS.value_of_program
       |> Enviroment.show_value)
 
 let () =

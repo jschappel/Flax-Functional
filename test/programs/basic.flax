@@ -1,0 +1,4 @@
+letrec 
+  p(x) => x 
+in
+  if true then 3 + 4 * 8 else 4

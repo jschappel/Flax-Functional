@@ -4,9 +4,6 @@ open Enviroment.Enviroment
 
 exception InterpreterError of string
 
-let unimplimented _ = raise @@ Failure "unimplimented!"
-(* TODO: Move utility function elsewhere *)
-
 let is_truthy = function BoolVal false -> false | _ -> true
 
 (* Determins if a variable occurs free in the given env *)
@@ -38,7 +35,7 @@ let rec make_free_var_env (env : env) (exp : expression) (acc : pair list) : env
       make_free_var_env ext_env exp free_vars
   | _ ->
       print_string "HERERE";
-      unimplimented ()
+      Utils.Todo.unimplimented ()
 
 let rec value_of (exp : expression) (env : env) : value =
   match exp with
