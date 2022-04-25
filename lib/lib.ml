@@ -4,4 +4,4 @@ include Enviroment (* TODO: Put this in a library? *)
 include Interpreter
 include Token
 include CoreProgram (* TODO: Put this in a library? *)
-module Transformations = Cps
+module Transformations = Cps1

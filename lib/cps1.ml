@@ -57,12 +57,15 @@ end = struct
         if_test_cont exp2 exp3 env cont |> value_of_k exp1 env
     | BinaryExpr (op, exp1, exp2) ->
         value_of_k exp1 env (diff_cont1 exp2 op env cont)
+    | CallExpr (name, params) ->  Todo.unimplimented ()
+      (* value_of_k name env (rator_cont params env cont) *)
     | _ -> Todo.unimplimented ()
 
   and apply_cont cont value = cont value
 
-  and let_exp_cont var body env cont value =
-    value_of_k body (ext_env [ (var, value) ] env) cont
+  and let_exp_cont var body env cont =
+    fun value -> value_of_k body (ext_env [ (var, value) ] env) cont
+    
 
   and if_test_cont exp2 exp3 env cont value =
     match value with
