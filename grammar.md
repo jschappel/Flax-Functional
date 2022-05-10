@@ -41,7 +41,7 @@ IfExp     ::= "(" <Exp> <Exp> <Exp> ")"
 
 CondExp   ::= "(" cond ("(" <Exp> <Exp> ")")+ ")"
 
-LambdaExp ::= "(" "lambda "(" <Var>* ")" <Exp> ")"
+LambdaExp ::= "(" "lambda" "(" <Var>* ")" <Exp> ")"
 
 LetExp    ::= "(" let "(" ("(" <Var> <Exp> ")")* ")" <Exp> ")"
 
