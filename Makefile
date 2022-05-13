@@ -2,8 +2,6 @@ exe: main.exe
 	$(dune build bin/program.exe)
 	dune exec bin/program.exe
 
-
-
 main.exe: install
 
 fast_test: install

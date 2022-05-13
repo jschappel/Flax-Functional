@@ -1,6 +1,6 @@
-type var = string
+type var = string [@@deriving show]
 
-type exp = 
+type exp =
   | NumExp of float
   | BoolExp of bool
   | SymExp of string
@@ -13,15 +13,14 @@ type exp =
   | AndExp of exp list
   | OrExp of exp list
   | NotExp of exp
-  | AppExp of exp * exp list 
+  | AppExp of exp * exp list
   | VectorExp of exp list
   | ListExp of exp list
   | SetExp of var * exp
   | BeginExp of exp list
+[@@deriving show]
 
-type def = 
-  | Def of var * exp
-  | DefFunc of var * var list * exp
+type def = Def of var * exp | DefFunc of var * var list * exp
+[@@deriving show]
 
-
-type program = Program of def list
+type program = Program of def list [@@deriving show]

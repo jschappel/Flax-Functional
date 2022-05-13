@@ -43,11 +43,11 @@ CondExp   ::= "(" cond ("(" <Exp> <Exp> ")")+ ")"
 
 LambdaExp ::= "(" "lambda" "(" <Var>* ")" <Exp> ")"
 
-LetExp    ::= "(" let "(" ("(" <Var> <Exp> ")")* ")" <Exp> ")"
+LetExp    ::= "(" "let" "(" ("(" <Var> <Exp> ")")* ")" <Exp> ")"
 
 LetrecExp ::= <Def>* <Exp>
 
-LetrecExp ::= "(" letrec "(" ("(" <Var> <Exp> ")")* ")" <Exp> ")"
+LetrecExp ::= "(" "letrec" "(" ("(" <Var> <Exp> ")")* ")" <Exp> ")"
 
 AndExp    ::= "(" "and" <Exp>* ")"
 
@@ -62,7 +62,8 @@ vectorexp ::= "(" "vector" <Exp>* ")"
 ListExp   ::= "(" "list" <Exp>* ")"
 
 SetExp    ::= "(" "set" <Var> <Exp> ")"
-BeginExp  ::= "(" begin <Exp>* ")"  
+
+BeginExp  ::= "(" "begin" <Exp>* ")"  
 ```
 
 where `CondExp` and `LetExp` are desugared.

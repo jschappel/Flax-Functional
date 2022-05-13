@@ -1,198 +1,51 @@
 open OUnit2
-open Lib
+open Flax_core.Lib.Parser
+open Flax_core.Lib.Test.Ast
 
-let addition _ =
-  assert_equal ~printer:show_expression
-    (parse_expression @@ lex_line "1 + 3")
-    (BinaryExpr (PLUS, LiteralExpr (Num 1.0), LiteralExpr (Num 3.0)))
+let prog_eq (s : string) (v : 'a) = assert_equal v (parse_program s)
 
-let subtraction _ =
-  assert_equal ~printer:show_expression
-    (parse_expression @@ lex_line "1 - 3")
-    (BinaryExpr (MINUS, LiteralExpr (Num 1.0), LiteralExpr (Num 3.0)))
+let parse_basic_types _ =
+  prog_eq "(define x 10)" (Program [ Def ("x", NumExp 10.0) ]);
+  prog_eq "(define x 10) (define y true)"
+    (Program [ Def ("x", NumExp 10.0); Def ("y", BoolExp true) ]);
+  prog_eq "(define string \"string\")"
+    (Program [ Def ("string", StrExp "string") ]);
+  prog_eq "(define sym '10_p )" (Program [ Def ("sym", SymExp "10_p") ]);
+  prog_eq "(define x xx)" (Program [ Def ("x", VarExp "xx") ])
 
-let multiplication _ =
-  assert_equal ~printer:show_expression
-    (parse_expression @@ lex_line "1 * 3")
-    (BinaryExpr (STAR, LiteralExpr (Num 1.0), LiteralExpr (Num 3.0)))
-
-let division _ =
-  assert_equal ~printer:show_expression
-    (parse_expression @@ lex_line "1 / 3")
-    (BinaryExpr (SLASH, LiteralExpr (Num 1.0), LiteralExpr (Num 3.0)))
-
-let mixed_math_operators _ =
-  assert_equal ~printer:show_expression
-    (parse_expression @@ lex_line "1 / 3 * 4 + 5 - 1")
-    (BinaryExpr
-       ( MINUS,
-         BinaryExpr
-           ( PLUS,
-             BinaryExpr
-               ( STAR,
-                 BinaryExpr (SLASH, LiteralExpr (Num 1.0), LiteralExpr (Num 3.0)),
-                 LiteralExpr (Num 4.0) ),
-             LiteralExpr (Num 5.0) ),
-         LiteralExpr (Num 1.0) ))
-
-let logical_operators _ =
-  assert_equal ~printer:show_expression
-    (parse_expression @@ lex_line "true and false or true")
-    (BinaryExpr
-       ( OR,
-         BinaryExpr (AND, LiteralExpr (Bool true), LiteralExpr (Bool false)),
-         LiteralExpr (Bool true) ))
-
-let unary_expr _ =
-  assert_equal ~printer:show_expression
-    (parse_expression @@ lex_line "not true and not false")
-    (BinaryExpr
-       ( AND,
-         UnaryExpr (NOT, LiteralExpr (Bool true)),
-         UnaryExpr (NOT, LiteralExpr (Bool false)) ))
-
-let equality _ =
-  assert_equal ~printer:show_expression
-    (parse_expression @@ lex_line "1 == 1 and 1 != 3")
-    (BinaryExpr
-       ( AND,
-         BinaryExpr (EQ_EQ, LiteralExpr (Num 1.0), LiteralExpr (Num 1.0)),
-         BinaryExpr (NOT_EQ, LiteralExpr (Num 1.0), LiteralExpr (Num 3.0)) ))
-
-let comparison _ =
-  assert_equal ~printer:show_expression
-    (parse_expression @@ lex_line "1 > 1 and 1 < 3 or 1 >= 1 and 1 <= 3")
-    (BinaryExpr
-       ( OR,
-         BinaryExpr
-           ( AND,
-             BinaryExpr (GT, LiteralExpr (Num 1.0), LiteralExpr (Num 1.0)),
-             BinaryExpr (LT, LiteralExpr (Num 1.0), LiteralExpr (Num 3.0)) ),
-         BinaryExpr
-           ( AND,
-             BinaryExpr (GT_EQ, LiteralExpr (Num 1.0), LiteralExpr (Num 1.0)),
-             BinaryExpr (LT_EQ, LiteralExpr (Num 1.0), LiteralExpr (Num 3.0)) )
-       ))
-
-let if_expression _ =
-  assert_equal ~printer:show_expression
-    (parse_expression @@ lex_line "if 5 > 1 then true else false")
-    (IfExpr
-       ( BinaryExpr (GT, LiteralExpr (Num 5.0), LiteralExpr (Num 1.0)),
-         LiteralExpr (Bool true),
-         LiteralExpr (Bool false) ))
-
-let let_expression1 _ =
-  assert_equal ~printer:show_expression
-    (parse_expression @@ lex_line "let x = 10 in x")
-    (LetExpr ([ ("x", LiteralExpr (Num 10.0)) ], LiteralExpr (Ident "x")))
-
-let let_expression2 _ =
-  assert_equal ~printer:show_expression
-    (parse_expression @@ lex_line "let x = 10; y = 20 in x + y")
-    (LetExpr
-       ( [ ("x", LiteralExpr (Num 10.0)); ("y", LiteralExpr (Num 20.0)) ],
-         BinaryExpr (PLUS, LiteralExpr (Ident "x"), LiteralExpr (Ident "y")) ))
-
-let let_expression3 _ =
-  assert_equal ~printer:show_expression
-    (parse_expression @@ lex_line "let x = 10; in x")
-    (LetExpr ([ ("x", LiteralExpr (Num 10.0)) ], LiteralExpr (Ident "x")))
-
-let let_expression4 _ =
-  assert_equal ~printer:show_expression
-    (parse_expression
-    @@ lex_line "let x = let xx = 10 in xx + 1; y = 20 in x + y")
-    (LetExpr
-       ( [
+let parse_if_exprs _ =
+  prog_eq "(define x (if true 1 0))"
+    (Program [ Def ("x", IfExp (BoolExp true, NumExp 1.0, NumExp 0.0)) ]);
+  prog_eq "(define x (if true (if false 0 1) 0))"
+    (Program
+       [
+         Def
            ( "x",
-             LetExpr
-               ( [ ("xx", LiteralExpr (Num 10.0)) ],
-                 BinaryExpr
-                   (PLUS, LiteralExpr (Ident "xx"), LiteralExpr (Num 1.0)) ) );
-           ("y", LiteralExpr (Num 20.0));
-         ],
-         BinaryExpr (PLUS, LiteralExpr (Ident "x"), LiteralExpr (Ident "y")) ))
+             IfExp
+               ( BoolExp true,
+                 IfExp (BoolExp false, NumExp 0.0, NumExp 1.0),
+                 NumExp 0.0 ) );
+       ])
 
-let letrec_expression _ =
-  assert_equal ~printer:show_expression
-    (LetRecExpr
-       ( [
-           ( "add",
-             [ "x"; "y" ],
-             BinaryExpr (PLUS, LiteralExpr (Ident "x"), LiteralExpr (Ident "y"))
-           );
-           ( "sub",
-             [ "xx"; "yy" ],
-             BinaryExpr
-               (MINUS, LiteralExpr (Ident "xx"), LiteralExpr (Ident "yy")) );
-         ],
-         CallExpr ("add", [ LiteralExpr (Num 4.0); LiteralExpr (Num 5.0) ]) ))
-    (parse_expression
-    @@ lex_line
-         "letrec\n\
-         \           add(x, y) => x + y;\n\
-         \           sub(xx, yy) => xx - yy\n\
-         \         in\n\
-         \           add(4,5)")
-
-let lambda_single _ =
-  assert_equal ~printer:show_expression
-    (parse_expression @@ lex_line "fn x => x + 10")
-    (FuncExpr
-       ( [ "x" ],
-         BinaryExpr (PLUS, LiteralExpr (Ident "x"), LiteralExpr (Num 10.0)) ))
-
-let lambda_mult _ =
-  assert_equal ~printer:show_expression
-    (parse_expression @@ lex_line "fn x, y => x + y")
-    (FuncExpr
-       ( [ "x"; "y" ],
-         BinaryExpr (PLUS, LiteralExpr (Ident "x"), LiteralExpr (Ident "y")) ))
-
-let empty_arg_call _ =
-  assert_equal ~printer:show_expression
-    (parse_expression @@ lex_line "x()")
-    (CallExpr ("x", []))
-
-let single_arg_call _ =
-  assert_equal ~printer:show_expression
-    (parse_expression @@ lex_line "x(10)")
-    (CallExpr ("x", [ LiteralExpr (Num 10.0) ]))
-
-let mult_arg_call _ =
-  assert_equal ~printer:show_expression
-    (parse_expression @@ lex_line "add(10, y + 20)")
-    (CallExpr
-       ( "add",
-         [
-           LiteralExpr (Num 10.0);
-           BinaryExpr (PLUS, LiteralExpr (Ident "y"), LiteralExpr (Num 20.0));
-         ] ))
+let parse_cond_exprs _ =
+  prog_eq "(define x (cond ((eq? x 10) true)   (else false)))"
+    (Program
+       [
+         Def
+           ( "x",
+             CondExp
+               [
+                 ( AppExp (VarExp "eq?", [ VarExp "x"; BoolExp true ]),
+                   BoolExp true );
+                 (VarExp "else", BoolExp false);
+               ] );
+       ])
 
 let suite =
-  "AST"
+  "Parser tests"
   >::: [
-         "Binary Add" >:: addition;
-         "Binary Sub" >:: subtraction;
-         "Binary Mult" >:: multiplication;
-         "Binary Div" >:: division;
-         "Binary Math Ops" >:: mixed_math_operators;
-         "Logical Ops" >:: logical_operators;
-         "Unary Exprs" >:: unary_expr;
-         "Equality Ops" >:: equality;
-         "Comparison Ops" >:: comparison;
-         "Basic_If Expr" >:: if_expression;
-         "Single Let Expr" >:: let_expression1;
-         "Multipule Let Expr" >:: let_expression2;
-         "Trailing ',' Let Expr" >:: let_expression3;
-         "Nested Let Expr" >:: let_expression4;
-         "Letrec Expr" >:: letrec_expression;
-         "Single Arg lambda" >:: lambda_single;
-         "Multi Arg lambda" >:: lambda_mult;
-         "Call Single Arg" >:: single_arg_call;
-         "Call Mult Args" >:: mult_arg_call;
-         "Call Empty Args" >:: empty_arg_call;
+         "Basic Types" >:: parse_basic_types;
+         "If Expressions" >:: parse_if_exprs;
        ]
 
-let () = run_test_tt_main suite
+let _ = run_test_tt_main suite

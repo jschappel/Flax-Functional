@@ -1,8 +1,6 @@
-(include_subdirs unqualified)
-
 (library
- (public_name lib)
- (libraries core)
+ (public_name flax_core)
+ (libraries core flax_parser)
  (preprocess
   (pps ppx_jane ppx_deriving.show ppx_deriving.eq)))
 

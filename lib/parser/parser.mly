@@ -24,7 +24,7 @@
 %token BEGIN
 %token IF
 %token COND
-/* %token ELSE */
+%token ELSE
 %token EOF
 
 %type <Ast.program> program
@@ -38,7 +38,7 @@ program:
 
 def: 
   | LPAREN; DEFINE; var=ID; e=exp; RPAREN { Def(var, e) }
-  /*| LPAREN; DEFINE; LPAREN; n=ID; p=vars; RPAREN; e=exp; RPAREN { DefFunc n p e } */
+  | LPAREN; DEFINE; LPAREN; n=ID; p=vars; RPAREN; e=exp; RPAREN { DefFunc(n, p, e) }
   ;
   
 exp:
@@ -73,6 +73,7 @@ vars:
 cond_branches: branch = cond_branches_helper { List.rev branch };
 cond_branches_helper:
   | (* empty *) { [] }
+  | LPAREN; ELSE; e1=exp; RPAREN; { (SymExp "else", e1 ) :: [] }
   | LPAREN; e1=exp; e2=exp; RPAREN; rst=cond_branches_helper { (e1, e2) :: rst }
   ;
 

@@ -1,10 +1,10 @@
 ;; see https://github.com/gildor478/ounit/tree/master/examples for test examples
 
 (tests
- (names lexerTest parserTest enviromentTest interpreterTest testPrograms)
+ (names parserTest)
  (action
   (run %{test} -ci=true))
- (libraries ounit2 lib))
+ (libraries ounit2 flax_core))
 
 (env
  (dev

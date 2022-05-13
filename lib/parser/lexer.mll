@@ -23,9 +23,11 @@ let frac = '.' digit*
 let number = digit* frac?
 
 (* regex for a identifier *)
-let identifier = (alpha|sign) (alpha|digit|'_'|sign)*
+let id_syms = ['_' '-' '?']
+let identifier = (alpha|sign) (alpha|digit|id_syms|sign)*
 
-(* throwaway characters *)
+
+(* throw away characters *)
 let white = [' ' '\t']+
 let newline = '\r' | '\n' | "\r\n"
 
@@ -48,7 +50,7 @@ rule read_token =
   | "set!"      { SET }
   | "begin"     { BEGIN }
   | "if"        { IF }
-  (* | "else"      { ELSE } *)
+  | "else"      { ELSE }
   | "cond"      { COND }
   | '"'         { read_string (Buffer.create 17) lexbuf }
   | "'"         { read_symbol (Buffer.create 17) lexbuf }
@@ -60,14 +62,11 @@ rule read_token =
 
 and read_symbol buf =
   parse
-  | alpha 
+  | alpha | digit | id_syms
     { Buffer.add_string buf (Lexing.lexeme lexbuf);
       read_symbol buf lexbuf
     }
-  | digit
-    { Buffer.add_string buf (Lexing.lexeme lexbuf);
-      read_symbol buf lexbuf
-    }
+  | '-'
   | white { SYMBOL (Buffer.contents buf) }
   | eof   { SYMBOL (Buffer.contents buf) }
   | _ { raise (SyntaxError ("Illegal symbol character: " ^ Lexing.lexeme lexbuf)) }

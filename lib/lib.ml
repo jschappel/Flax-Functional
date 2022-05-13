@@ -1,7 +1,6 @@
-include Lexer
-include Parser
-include Enviroment (* TODO: Put this in a library? *)
-include Interpreter
-include Token
-include CoreProgram (* TODO: Put this in a library? *)
-module Transformations = Cps1
+module Utils = Utils
+module Parser = Flax_parser.ParserInterface
+
+module Test = struct
+  module Ast = Flax_parser.Ast
+end
