@@ -67,4 +67,66 @@ BeginExp  ::= "(" "begin" <Exp>* ")"
 ```
 
 where `CondExp` and `LetExp` are desugared.
+
+
 ## Core Grammar
+```shell
+CoreProgram ::= <CoreDef>+
+
+CoreDef         ::=  CoreVar <CoreExp> 
+
+CoreExp         ::= <CoreNumExp>
+                  | <CoreBoolExp>
+                  | <CoreSymExp>
+                  | <CoreStrExp>
+                  | <CoreVarExp>
+                  | <CoreIfExp>
+                  | <CoreCondExp>
+                  | <CoreLambdaExp>
+                  | <CoreLetExp>
+                  | <CoreLetrecExp>
+                  | <CoreAndExp>
+                  | <CoreOrExp>
+                  | <CoreNotExp>
+                  | <CoreAppExp>
+                  | <CoreVectorExp>
+                  | <CoreListExp>
+                  | <CoreSetExp>
+                  | <CoreBeginExp>
+
+CoreNumExp      ::= NUMBER
+
+CoreBoolExp     ::= BOOL
+
+CoreSymExp      ::= CoreVar
+
+CoreStrExp      ::= STRING
+
+CoreVarExp      ::= CoreVar
+
+CoreFreeVarExp  ::= CoreVar Number
+
+CoreIfExp       ::= <CoreExp> <CoreExp> <CoreExp> 
+
+CoreLambdaExp   ::=  <CoreVar>*  <CoreExp> 
+
+CoreLetExp      ::=  (<CoreLetDeclExp>)*  <CoreExp>
+
+CoreLetDeclExp  ::= CoreVar CoreExp
+
+CoreAndExp      ::= <CoreExp>* 
+
+CoreOrExp       ::= <CoreExp>* 
+
+CoreNotExp      ::= <CoreExp>
+
+CoreAppExp      ::= <CoreExp> <CoreExp>*
+
+CoreVectorexp   ::= <CoreExp>*
+
+CoreListExp     ::= <Exp>*
+
+CoreSetExp      ::= <Var> <Exp>
+
+CoreBeginExp    ::= <Exp>* 
+```
