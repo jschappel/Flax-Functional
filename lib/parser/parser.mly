@@ -70,14 +70,14 @@ vars:
   ;
 
 /* parses all cond branches */
-cond_branches: branch = cond_branches_helper { List.rev branch };
+cond_branches: branch = cond_branches_helper { branch };
 cond_branches_helper:
   | (* empty *) { [] }
   | LPAREN; ELSE; e1=exp; RPAREN; { (SymExp "else", e1 ) :: [] }
   | LPAREN; e1=exp; e2=exp; RPAREN; rst=cond_branches_helper { (e1, e2) :: rst }
   ;
 
-var_exps: decs = var_exps_helper { List.rev decs };
+var_exps: decs = var_exps_helper { decs };
 var_exps_helper:
   | (* empty *) { [] }
   | LPAREN; id=ID; e=exp; RPAREN; rst=var_exps_helper { (id, e) :: rst }

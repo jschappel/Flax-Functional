@@ -62,14 +62,14 @@ rule read_token =
 
 and read_symbol buf =
   parse
-  | alpha | digit | id_syms
+  | alpha | digit | id_syms | number
     { Buffer.add_string buf (Lexing.lexeme lexbuf);
       read_symbol buf lexbuf
     }
   | '-'
   | white { SYMBOL (Buffer.contents buf) }
   | eof   { SYMBOL (Buffer.contents buf) }
-  | _ { raise (SyntaxError ("Illegal symbol character: " ^ Lexing.lexeme lexbuf)) }
+  | _     { SYMBOL (Buffer.contents buf) }
 
 and read_string buf =
   parse
