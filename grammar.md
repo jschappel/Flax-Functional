@@ -65,7 +65,6 @@ SetExp    ::= "(" "set" <Var> <Exp> ")"
 
 BeginExp  ::= "(" "begin" <Exp>* ")"  
 ```
-
 where `CondExp` and `LetExp` are desugared.
 
 
@@ -108,7 +107,7 @@ CoreFreeVarExp  ::= CoreVar Number
 
 CoreIfExp       ::= <CoreExp> <CoreExp> <CoreExp> 
 
-CoreLambdaExp   ::=  <CoreVar>*  <CoreExp> 
+CoreLambdaExp   ::=  <CoreVar>*  <CoreExp> <CoreVar>*
 
 CoreLetExp      ::=  (<CoreLetDeclExp>)*  <CoreExp>
 

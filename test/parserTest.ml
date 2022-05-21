@@ -102,35 +102,30 @@ let parse_app_exprs _ =
            VarExp "z";
          ] ))
 
-let parse_vector_exprs _ = 
-  exp_eq "(define x (vector))"
-  (VectorExp []);
+let parse_vector_exprs _ =
+  exp_eq "(define x (vector))" (VectorExp []);
   exp_eq "(define x (vector 1 2 '4 8))"
-  (VectorExp [NumExp 1.; NumExp 2.; SymExp "4"; NumExp 8.])
+    (VectorExp [ NumExp 1.; NumExp 2.; SymExp "4"; NumExp 8. ])
 
-let parse_list_exprs _ = 
-  exp_eq "(define x (list))"
-  (ListExp []);
+let parse_list_exprs _ =
+  exp_eq "(define x (list))" (ListExp []);
   exp_eq "(define x (list 1 2 '4 8))"
-  (ListExp [NumExp 1.; NumExp 2.; SymExp "4"; NumExp 8.])
+    (ListExp [ NumExp 1.; NumExp 2.; SymExp "4"; NumExp 8. ])
 
-let parse_set_exprs _ = 
-  exp_eq "(define x (set! y 10))"
-  (SetExp("y", NumExp 10.));
+let parse_set_exprs _ =
+  exp_eq "(define x (set! y 10))" (SetExp ("y", NumExp 10.));
   exp_eq "(define x (set! y (+ 4 1)))"
-  (SetExp("y", AppExp(VarExp"+", [NumExp 4.; NumExp 1.])))
-  
-let parse_begin_exprs _ = 
+    (SetExp ("y", AppExp (VarExp "+", [ NumExp 4.; NumExp 1. ])))
+
+let parse_begin_exprs _ =
   exp_eq "(define x (begin (set! x 10) (set! y 20)))"
-  (BeginExp [
-    (SetExp("x", NumExp 10.));
-    (SetExp("y", NumExp 20.));
-  ]);
+    (BeginExp [ SetExp ("x", NumExp 10.); SetExp ("y", NumExp 20.) ]);
   exp_eq "(define x (begin (list 1 2 '4 8) (+ 2 1)))"
-  (BeginExp [
-    (ListExp [NumExp 1.; NumExp 2.; SymExp "4"; NumExp 8.]);
-    (AppExp (VarExp "+", [ NumExp 2.; NumExp 1.]));
-  ])
+    (BeginExp
+       [
+         ListExp [ NumExp 1.; NumExp 2.; SymExp "4"; NumExp 8. ];
+         AppExp (VarExp "+", [ NumExp 2.; NumExp 1. ]);
+       ])
 
 let suite =
   "Parser tests"
