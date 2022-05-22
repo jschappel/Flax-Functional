@@ -127,6 +127,15 @@ let parse_begin_exprs _ =
          AppExp (VarExp "+", [ NumExp 2.; NumExp 1. ]);
        ])
 
+let parse_func_defs _ = 
+  prog_eq "(define (add) (+))"
+  (Program [DefFunc("add", [], AppExp(VarExp "+", []))]);
+
+  prog_eq "(define (sub x y) (- x y))"
+  (Program [DefFunc("sub", ["x";"y"], AppExp(VarExp"-", [VarExp "x";VarExp"y"]))])
+
+
+
 let suite =
   "Parser tests"
   >::: [
@@ -143,6 +152,7 @@ let suite =
          "List Expressions" >:: parse_list_exprs;
          "Set Expressions" >:: parse_set_exprs;
          "Begin Expressions" >:: parse_begin_exprs;
+         "Define Functions" >:: parse_func_defs;
        ]
 
 let _ = run_test_tt_main suite
