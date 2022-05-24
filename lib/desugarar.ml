@@ -1,7 +1,8 @@
 open Flax_parser.Ast
 open CoreGrammer
 open Utils
-
+(** A detailed explination of how each of the expression are desugared can be found in: `doc/desugar.md`
+*)
 let rec desugar_exp = function
   | NumExp n -> CoreNumExp n
   | BoolExp b -> CoreBoolExp b
@@ -23,9 +24,6 @@ let rec desugar_exp = function
   | VectorExp lst -> desugar_vector lst
   | _ -> failwith "error"
 
-(* If the source expression is a listexp, create a core-listexp
-   by desugaring all of the expressions in the listexp.
-*)
 and desugar_list lst =
   CoreAppExp (CoreVarExp "emptylist", [])
   |> List.fold_right
@@ -56,12 +54,6 @@ and desugar_vector lst =
             [ List.length lst |> Int.to_float |> CoreNumExp ] );
       ] )
 
-(*
-  create a core-appexp with the operator being a core-lambdaexp where the same 
-  parameters are the variables of the let, and the body of the lambda being
-  the desugared body of the source let, while the operands of the core-appexp
-  are the desugared right hand side expressions of the source letexp.
-*)
 and desugar_let e lst =
   let params = List.map (fun (v, _) -> v) lst in
   let exps = List.map (fun (_, e) -> desugar_exp e) lst in
