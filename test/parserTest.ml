@@ -2,7 +2,7 @@ open OUnit2
 open Flax_core.Lib.Parser
 open Flax_core.Lib.Test.Ast
 
-(* Checks if two progams are equivalent to one another *)
+(* Checks if two programs are equivalent to one another *)
 let prog_eq (s : string) (v : 'a) : unit =
   assert_equal ~printer:show_program v (parse_program s)
 

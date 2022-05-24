@@ -1,4 +1,6 @@
 (** This file contaiens constants used throughout the compiler *)
 
-(** Unreachable branch case for a cond exp *)
-let unreachable_cond_exp = CoreGrammer.CoreVarExp "$$UNREACHABLE$$"
+(** When given *)
+let void_cond_exp = CoreGrammer.CoreVarExp "$$VOID$$"
+
+let placeholder_var = CoreGrammer.CoreVarExp "$V$"

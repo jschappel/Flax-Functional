@@ -15,13 +15,45 @@ let rec desugar_exp = function
   | OrExp lst -> List.map desugar_exp lst |> CoreOfExp
   | NotExp e -> desugar_exp e |> CoreNotExp
   | AppExp (e, lst) -> CoreAppExp (desugar_exp e, List.map desugar_exp lst)
-  | VectorExp lst -> List.map desugar_exp lst |> CoreVectorExp
-  | ListExp lst -> List.map desugar_exp lst |> CoreListExp
   | SetExp (id, e) -> CoreSetExp (id, desugar_exp e)
   | BeginExp lst -> List.map desugar_exp lst |> CoreBeginExp
   | CondExp lst -> desugar_cond lst
   | LetExp (lst, e) -> desugar_let e lst
-  | _ -> failwith "Error"
+  | ListExp lst -> desugar_list lst
+  | VectorExp lst -> desugar_vector lst
+
+(* If the source expression is a listexp, create a core-listexp
+   by desugaring all of the expressions in the listexp.
+*)
+and desugar_list lst =
+  CoreAppExp (CoreVarExp "emptylist", [])
+  |> List.fold_right
+       (fun e acc -> CoreAppExp (CoreVarExp "cons", [ desugar_exp e; acc ]))
+       lst
+
+and desugar_vector lst =
+  let begin_exp =
+    [ Constants.placeholder_var ]
+    |> List.append
+         (List.mapi
+            (fun i e ->
+              CoreAppExp
+                ( CoreVarExp "array-set!",
+                  [
+                    Constants.placeholder_var;
+                    Int.to_float i |> CoreNumExp;
+                    desugar_exp e;
+                  ] ))
+            lst)
+    |> CoreBeginExp
+  in
+  CoreAppExp
+    ( CoreLambdaExp ([ "$V$" ], begin_exp, []),
+      [
+        CoreAppExp
+          ( CoreVarExp "allocate-array",
+            [ List.length lst |> Int.to_float |> CoreNumExp ] );
+      ] )
 
 (*
   create a core-appexp with the operator being a core-lambdaexp where the same 
@@ -37,13 +69,13 @@ and desugar_let e lst =
 
 and desugar_cond lst =
   let rec helper = function
-    | [] -> Constants.unreachable_cond_exp
-    | [ (VarExp "else", r) ] -> desugar_exp r
+    | [] -> Constants.void_cond_exp
+    | [ (SymExp "else", r) ] -> desugar_exp r
     | (l, r) :: xs -> CoreIfExp (desugar_exp l, desugar_exp r, helper xs)
   in
   match lst with
-  | [ (VarExp "else", r) ] ->
-      CoreIfExp (CoreBoolExp true, desugar_exp r, Constants.unreachable_cond_exp)
+  | [ (SymExp "else", r) ] ->
+      CoreIfExp (CoreBoolExp true, desugar_exp r, Constants.void_cond_exp)
   | l -> helper l
 
 let desugar_def = function

@@ -65,7 +65,7 @@ SetExp    ::= "(" "set" <Var> <Exp> ")"
 
 BeginExp  ::= "(" "begin" <Exp>* ")"  
 ```
-where `CondExp` and `LetExp` are desugared.
+where `CondExp`, `ListExp`, `VectorExp` and `LetExp` are desugared.
 
 
 ## Core Grammar
@@ -121,7 +121,7 @@ CoreNotExp      ::= <CoreExp>
 
 CoreAppExp      ::= <CoreExp> <CoreExp>*
 
-CoreVectorexp   ::= <CoreExp>*
+CoreVectorExp   ::= <CoreExp>*
 
 CoreListExp     ::= <Exp>*
 
