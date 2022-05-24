@@ -12,7 +12,7 @@ let prog_eq (s : string) (v : 'a) : unit =
 *)
 let exp_eq (s : string) (v : 'a) : unit =
   match parse_program s with
-  | Program [ Def (_, exp) ] -> assert_equal ~printer:show_exp exp v
+  | Program [ Def (_, exp) ] -> assert_equal ~printer:show_exp v exp
   | _ ->
       failwith
         "This Function can only be used to check a program wiht a single \
@@ -127,14 +127,16 @@ let parse_begin_exprs _ =
          AppExp (VarExp "+", [ NumExp 2.; NumExp 1. ]);
        ])
 
-let parse_func_defs _ = 
+let parse_func_defs _ =
   prog_eq "(define (add) (+))"
-  (Program [DefFunc("add", [], AppExp(VarExp "+", []))]);
+    (Program [ DefFunc ("add", [], AppExp (VarExp "+", [])) ]);
 
   prog_eq "(define (sub x y) (- x y))"
-  (Program [DefFunc("sub", ["x";"y"], AppExp(VarExp"-", [VarExp "x";VarExp"y"]))])
-
-
+    (Program
+       [
+         DefFunc
+           ("sub", [ "x"; "y" ], AppExp (VarExp "-", [ VarExp "x"; VarExp "y" ]));
+       ])
 
 let suite =
   "Parser tests"

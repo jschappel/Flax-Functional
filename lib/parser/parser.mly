@@ -69,8 +69,11 @@ vars:
   | i=ID; rst=vars { i :: rst }
   ;
 
-/* parses all cond branches */
-cond_branches: branch = cond_branches_helper { branch };
+/* parses all cond branches: We need to duplicate the code to make sure `(cond ) is not accpetable*/
+cond_branches:
+    | LPAREN; ELSE; e1=exp; RPAREN; { (SymExp "else", e1 ) :: [] }
+    | LPAREN; e1=exp; e2=exp; RPAREN; rst=cond_branches_helper { (e1, e2) :: rst }
+
 cond_branches_helper:
   | (* empty *) { [] }
   | LPAREN; ELSE; e1=exp; RPAREN; { (SymExp "else", e1 ) :: [] }

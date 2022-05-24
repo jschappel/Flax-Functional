@@ -1,7 +1,6 @@
-(**
-  This File contains the source grammar of the compiler. This is the grammar that is provided by the user
-  and contains syntatic sugar constructs are will later be broken down by the compiler.
-*)
+(** This File contains the source grammar of the compiler. This is the grammar
+    that is provided by the user and contains syntatic sugar constructs are will
+    later be broken down by the compiler. *)
 
 type var = string [@@deriving show]
 
