@@ -21,6 +21,7 @@ let rec desugar_exp = function
   | LetExp (lst, e) -> desugar_let e lst
   | ListExp lst -> desugar_list lst
   | VectorExp lst -> desugar_vector lst
+  | _ -> failwith "error"
 
 (* If the source expression is a listexp, create a core-listexp
    by desugaring all of the expressions in the listexp.

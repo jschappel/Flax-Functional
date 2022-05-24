@@ -45,9 +45,7 @@ LambdaExp ::= "(" "lambda" "(" <Var>* ")" <Exp> ")"
 
 LetExp    ::= "(" "let" "(" ("(" <Var> <Exp> ")")* ")" <Exp> ")"
 
-LetrecExp ::= <Def>* <Exp>
-
-LetrecExp ::= "(" "letrec" "(" ("(" <Var> <Exp> ")")* ")" <Exp> ")"
+LetrecExp ::= "(" "letrec" "(" ("(" <Def> ")")* ")" <Exp> ")"
 
 AndExp    ::= "(" "and" <Exp>* ")"
 

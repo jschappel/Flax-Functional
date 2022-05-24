@@ -69,6 +69,25 @@ let parse_let_exprs _ =
            ( [ ("z", NumExp 30.0) ],
              AppExp (VarExp "+", [ VarExp "x"; VarExp "y"; VarExp "z" ]) ) ))
 
+let parse_letrec_exprs _ =
+  exp_eq "(define x (letrec ((define (add x) 10)) (add 10 x)))"
+    (LetRecExp
+       ( [ ("add", [ "x" ], NumExp 10.0) ],
+         AppExp (VarExp "add", [ NumExp 10.; VarExp "x" ]) ));
+  exp_eq
+    "(define x (letrec ((define (add x) 10) (define (sub x y) 20)) (+ y x)))"
+    (LetRecExp
+       ( [ ("add", [ "x" ], NumExp 10.0); ("sub", [ "x"; "y" ], NumExp 20.0) ],
+         AppExp (VarExp "+", [ VarExp "y"; VarExp "x" ]) ));
+  exp_eq
+    "(define x (letrec ((define (add x) 10) (define (sub x y) 20)) (letrec \
+     ((define (mult) 30)) (+ x y z))))"
+    (LetRecExp
+       ( [ ("add", [ "x" ], NumExp 10.0); ("sub", [ "x"; "y" ], NumExp 20.0) ],
+         LetRecExp
+           ( [ ("mult", [], NumExp 30.0) ],
+             AppExp (VarExp "+", [ VarExp "x"; VarExp "y"; VarExp "z" ]) ) ))
+
 let parse_and_exprs _ =
   exp_eq "(define x (and true false true 10))"
     (AndExp [ BoolExp true; BoolExp false; BoolExp true; NumExp 10.0 ]);
@@ -146,6 +165,7 @@ let suite =
          "Cond Expressions" >:: parse_cond_exprs;
          "Lambda Expressions" >:: parse_lambda_exprs;
          "Let Expressions" >:: parse_let_exprs;
+         "Letrec Expressions" >:: parse_letrec_exprs;
          "And Expressions" >:: parse_and_exprs;
          "Or Expressions" >:: parse_or_exprs;
          "Not Expressions" >:: parse_not_exprs;

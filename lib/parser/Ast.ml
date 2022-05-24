@@ -14,6 +14,7 @@ type exp =
   | CondExp of (exp * exp) list
   | LambdaExp of var list * exp
   | LetExp of (var * exp) list * exp
+  | LetRecExp of (var * var list * exp) list * exp
   | AndExp of exp list
   | OrExp of exp list
   | NotExp of exp

@@ -41,7 +41,7 @@ rule read_token =
   | "define"    { DEFINE }
   | "lambda"    { LAMBDA }
   | "let"       { LET }
-  (* | "letrec"    { LETREC } *)
+  | "letrec"    { LETREC }
   | "and"       { AND }
   | "not"       { NOT }
   | "list"      { LIST }

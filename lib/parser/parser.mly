@@ -14,7 +14,7 @@
 %token DEFINE
 %token LAMBDA
 %token LET
-/* %token LETREC */
+%token LETREC
 %token AND
 %token NOT
 %token OR
@@ -60,7 +60,7 @@ exp:
   | LPAREN; LIST; es=exp*; RPAREN { ListExp es }
   | LPAREN; SET; var=ID; e=exp; RPAREN { SetExp(var, e) }
   | LPAREN; BEGIN; es=exp*; RPAREN { BeginExp es }
-
+  | LPAREN; LETREC; LPAREN; defs=letrec_exps; RPAREN; body=exp; RPAREN; { LetRecExp(defs, body) }
   ;
 
 /* parses a list of vars */
@@ -85,3 +85,7 @@ var_exps_helper:
   | (* empty *) { [] }
   | LPAREN; id=ID; e=exp; RPAREN; rst=var_exps_helper { (id, e) :: rst }
   ;
+
+letrec_exps:
+  | { [] }
+  | LPAREN; DEFINE; LPAREN; n=ID; p=ID*; RPAREN; e=exp; RPAREN; rst=letrec_exps { (n, p, e) :: rst }
