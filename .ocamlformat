@@ -1,5 +1,9 @@
 version = 0.21.0
-break-infix=fit-or-vertical
-parse-docstrings=true
+profile = default
+margin = 90
 indicate-multiline-delimiters=no
 doc-comments=before
+parse-docstrings = true
+wrap-comments = true
+break-infix=fit-or-vertical
+type-decl=sparse

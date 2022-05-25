@@ -1,6 +1,6 @@
-(** This File contains the source grammar of the compiler. This is the grammar
-    that is provided by the user and contains syntatic sugar constructs are will
-    later be broken down by the compiler. *)
+(** This File contains the source grammar of the compiler. This is the grammar that is
+    provided by the user and contains syntatic sugar constructs are will later be broken
+    down by the compiler. *)
 
 type var = string [@@deriving show]
 
@@ -25,7 +25,9 @@ type exp =
   | BeginExp of exp list
 [@@deriving show]
 
-type def = Def of var * exp | DefFunc of var * var list * exp
+type def =
+  | Def of var * exp
+  | DefFunc of var * var list * exp
 [@@deriving show]
 
 type program = Program of def list [@@deriving show]

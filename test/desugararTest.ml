@@ -7,18 +7,15 @@ let core_prog_eq (s : string) (v : 'a) : unit =
   let run x = Flax_core.Lib.Parser.parse_program x |> desugar_program in
   assert_equal ~printer:show_core_prog v (run s)
 
-(*
-   Checks if two core expressions are equivalent to one another, ignoring the outter define expression
-   Note: This can only be used to check a program with one definiton
-*)
+(* Checks if two core expressions are equivalent to one another, ignoring the outter
+   define expression Note: This can only be used to check a program with one definiton *)
 let core_exp_eq (s : string) (v : 'a) : unit =
   let run x = Flax_core.Lib.Parser.parse_program x |> desugar_program in
   match run s with
   | CoreProg [ CoreDef (_, exp) ] -> assert_equal ~printer:show_core_exp v exp
   | _ ->
       failwith
-        "This Function can only be used to check a program wiht a single \
-         definition"
+        "This Function can only be used to check a program wiht a single definition"
 
 let desugar_def_exps _ =
   core_prog_eq "(define (a) true)"
@@ -50,8 +47,7 @@ let desugar_let_exps _ =
                ( CoreLambdaExp
                    ( [ "z" ],
                      CoreAppExp
-                       ( CoreVarExp "+",
-                         [ CoreVarExp "x"; CoreVarExp "y"; CoreVarExp "z" ] ),
+                       (CoreVarExp "+", [ CoreVarExp "x"; CoreVarExp "y"; CoreVarExp "z" ]),
                      [] ),
                  [ CoreNumExp 30. ] ),
              [] ),
@@ -59,8 +55,7 @@ let desugar_let_exps _ =
 
 let desugar_cond_exps _ =
   core_exp_eq "(define x (cond (else 20)))"
-    (CoreIfExp
-       (CoreBoolExp true, CoreNumExp 20.0, Flax_core.Constants.void_cond_exp));
+    (CoreIfExp (CoreBoolExp true, CoreNumExp 20.0, Flax_core.Constants.void_cond_exp));
   core_exp_eq "(define x (cond ((eq? 10 y) true) (else false)))"
     (CoreIfExp
        ( CoreAppExp (CoreVarExp "eq?", [ CoreNumExp 10.; CoreVarExp "y" ]),
@@ -93,7 +88,6 @@ let desugar_vector_exps _ =
        ( CoreLambdaExp
            ([ "$V$" ], CoreBeginExp [ Flax_core.Constants.placeholder_var ], []),
          [ CoreAppExp (CoreVarExp "allocate-array", [ CoreNumExp 0. ]) ] ));
-
   core_exp_eq "(define x (vector 10 20 30))"
     (CoreAppExp
        ( CoreLambdaExp
@@ -103,23 +97,17 @@ let desugar_vector_exps _ =
                  CoreAppExp
                    ( CoreVarExp "array-set!",
                      [
-                       Flax_core.Constants.placeholder_var;
-                       CoreNumExp 0.;
-                       CoreNumExp 10.;
+                       Flax_core.Constants.placeholder_var; CoreNumExp 0.; CoreNumExp 10.;
                      ] );
                  CoreAppExp
                    ( CoreVarExp "array-set!",
                      [
-                       Flax_core.Constants.placeholder_var;
-                       CoreNumExp 1.;
-                       CoreNumExp 20.;
+                       Flax_core.Constants.placeholder_var; CoreNumExp 1.; CoreNumExp 20.;
                      ] );
                  CoreAppExp
                    ( CoreVarExp "array-set!",
                      [
-                       Flax_core.Constants.placeholder_var;
-                       CoreNumExp 2.;
-                       CoreNumExp 30.;
+                       Flax_core.Constants.placeholder_var; CoreNumExp 2.; CoreNumExp 30.;
                      ] );
                  CoreVarExp "$V$";
                ],

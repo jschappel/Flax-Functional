@@ -1,16 +1,16 @@
 open Flax_parser.Ast
 open CoreGrammer
 open Utils
-(** A detailed explination of how each of the expression are desugared can be found in: `doc/desugar.md`
-*)
+(* A detailed explination of how each of the expression are desugared can be found in:
+   `doc/desugar.md` *)
+
 let rec desugar_exp = function
   | NumExp n -> CoreNumExp n
   | BoolExp b -> CoreBoolExp b
   | SymExp s -> CoreSymExp s
   | StrExp s -> CoreStrExp s
   | VarExp v -> CoreVarExp v
-  | IfExp (e1, e2, e3) ->
-      CoreIfExp (desugar_exp e1, desugar_exp e2, desugar_exp e3)
+  | IfExp (e1, e2, e3) -> CoreIfExp (desugar_exp e1, desugar_exp e2, desugar_exp e3)
   | LambdaExp (ids, e) -> CoreLambdaExp (ids, desugar_exp e, [])
   | AndExp lst -> List.map desugar_exp lst |> CoreAndExp
   | OrExp lst -> List.map desugar_exp lst |> CoreOfExp
@@ -39,9 +39,7 @@ and desugar_vector lst =
               CoreAppExp
                 ( CoreVarExp "array-set!",
                   [
-                    Constants.placeholder_var;
-                    Int.to_float i |> CoreNumExp;
-                    desugar_exp e;
+                    Constants.placeholder_var; Int.to_float i |> CoreNumExp; desugar_exp e;
                   ] ))
             lst)
     |> CoreBeginExp
@@ -50,8 +48,7 @@ and desugar_vector lst =
     ( CoreLambdaExp ([ "$V$" ], begin_exp, []),
       [
         CoreAppExp
-          ( CoreVarExp "allocate-array",
-            [ List.length lst |> Int.to_float |> CoreNumExp ] );
+          (CoreVarExp "allocate-array", [ List.length lst |> Int.to_float |> CoreNumExp ]);
       ] )
 
 and desugar_let e lst =
