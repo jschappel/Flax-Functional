@@ -16,7 +16,7 @@
 
 (package 
  (name flax_environment)
- (synopsis "Contains files for the compilers enviroment")
+ (synopsis "Contains files for the compilers environment")
  (depends
   core
   ppx_deriving))
@@ -34,6 +34,7 @@
  (depends
   (ounit2 :with-test)
   core
+  menhir
   ppx_deriving))
 
 

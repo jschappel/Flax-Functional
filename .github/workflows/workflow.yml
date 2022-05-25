@@ -21,10 +21,10 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Run Tests
+      - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Use OCaml ${{ matrix.ocaml-compiler }}
+      - name: Run Tests
         uses: ocaml/setup-ocaml@v2
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
@@ -40,3 +40,4 @@ jobs:
         with:
           name: ${{ matrix.os }}-${{ matrix.ocaml-version }}-world.exe
           path: _build/default/world.exe
+
