@@ -13,4 +13,5 @@ let parse' f s =
     raise (Failure ("Parse error at " ^ pos_string lexbuf.lex_curr_p))
 
 let parse_program s = parse' Parser.program s
+
 let show_program = Ast.show_program

@@ -27,3 +27,7 @@ setup.log
 
 # Local OPAM switch
 _opam/
+
+# Ignore other opam files
+flax_parser.opam
+flax_repl.opam

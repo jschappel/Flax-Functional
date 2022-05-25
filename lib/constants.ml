@@ -1,4 +1,4 @@
-(** This file contaiens constants used throughout the compiler *)
+(* This file contaiens constants used throughout the compiler *)
 
 (** When given *)
 let void_cond_exp = CoreGrammer.CoreVarExp "$$VOID$$"

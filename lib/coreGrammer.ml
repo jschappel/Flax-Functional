@@ -1,5 +1,5 @@
-(** This File contains the compiler internal representation of the grammar. This is the
-    final form of the grammar and is generated after desugaring the program. *)
+(* This File contains the compiler internal representation of the grammar. This is the
+   final form of the grammar and is generated after desugaring the program. *)
 
 type core_exp =
   (* Below are the 4 const expression of the Core Grammar *)
