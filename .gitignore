@@ -31,3 +31,6 @@ _opam/
 # Ignore other opam files
 flax_parser.opam
 flax_repl.opam
+
+# VSCode
+.vscode

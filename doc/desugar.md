@@ -54,7 +54,7 @@ List expressions are desugared into a nested core application expression where t
 (list 1 2 3)
 
 ; After desugaring becomes
-('cons 1 ('cons 2) ('cons 3 'emptylist))
+(cons 1 (cons 2 (cons 3 emptylist)))
 ```
 
 
@@ -70,4 +70,18 @@ Vector expressions are desugared into a application expression where the proc is
                  (array-set! $V$ 1 20)
                  (array-set! $V$ 2 30)))
  ('allocate-array 3))
+```
+
+### Let
+Let expressions are desugared into an application expression where the operator is a lambda expression, whose body is the body of the let expression, and the operands are the values assigned to the let declarations. 
+
+```racket 
+(let ((x 10 )
+      (y (- 20 30))
+  (+ x y))
+
+; After desugaring becomes
+((lambda (x y) (+ x y))
+ 10
+ (- 20 30))
 ```

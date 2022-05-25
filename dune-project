@@ -16,7 +16,7 @@
 
 (package 
  (name flax_parser)
- (synopsis "A interactive repl for the compiler")
+ (synopsis "The parser and lexer for the compiler")
  (depends
   core
   ppx_deriving))
