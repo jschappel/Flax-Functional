@@ -15,6 +15,13 @@
   core))
 
 (package 
+ (name flax_environment)
+ (synopsis "Contains files for the compilers enviroment")
+ (depends
+  core
+  ppx_deriving))
+
+(package 
  (name flax_parser)
  (synopsis "The parser and lexer for the compiler")
  (depends

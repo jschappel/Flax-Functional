@@ -1,6 +1,7 @@
 (library
- (public_name flax_core)
- (libraries core flax_parser flax_environment)
+ (name flax_environment)
+ (public_name flax_environment)
+ (libraries core)
  (preprocess
   (pps ppx_jane ppx_deriving.show ppx_deriving.eq)))
 
