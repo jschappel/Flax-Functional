@@ -128,7 +128,7 @@ let desugar_letrec_exps _ =
                  CoreAppExp (CoreVarExp "is-odd?", [ CoreNumExp 11. ]);
                ],
              [] ),
-         [ CoreNumExp 42.; CoreNumExp 42. ] ));
+         [ Flax_core.Constants.dummy_var; Flax_core.Constants.dummy_var ] ));
   core_exp_eq
     "(define x (letrec ((define (is-even? n z) true)   (define (is-odd? n z y) false)) \
      (is-odd? 11 12 13)))"
@@ -146,7 +146,7 @@ let desugar_letrec_exps _ =
                      [ CoreNumExp 11.; CoreNumExp 12.; CoreNumExp 13. ] );
                ],
              [] ),
-         [ CoreNumExp 42.; CoreNumExp 42. ] ))
+         [ Flax_core.Constants.dummy_var; Flax_core.Constants.dummy_var ] ))
 
 let suite =
   "Desugarar tests"

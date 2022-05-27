@@ -22,7 +22,7 @@ type core_exp =
   | CoreLambdaExp of string list * core_exp * string list
       (** A CoreAndExp is a list of boolean expressions *)
   | CoreAndExp of core_exp list  (** A CoreOrExp is a list of boolean expressions *)
-  | CoreOfExp of core_exp list  (** A CoreNotExp is an expression to be negated *)
+  | CoreOrExp of core_exp list  (** A CoreNotExp is an expression to be negated *)
   | CoreNotExp of core_exp
       (** A CoreAppExp is an expression representing the function that is going to be
           applied, as well as a list of expressions for the input values. *)
@@ -43,11 +43,11 @@ type core_exp =
 and core_let_decl = string * core_exp
 
 (** A variable is an identifier represented as a string *)
-and identifier = string [@@deriving show]
+and identifier = string [@@deriving show, eq]
 
 (** A CoreDefinition includes a identifier and an expression that represents the body of
     the definition.*)
-type core_def = CoreDef of identifier * core_exp [@@deriving show]
+type core_def = CoreDef of identifier * core_exp [@@deriving show, eq]
 
 (** A CoreProgram is a list of Core Definitions *)
-type core_prog = CoreProg of core_def list [@@deriving show]
+type core_prog = CoreProg of core_def list [@@deriving show, eq]

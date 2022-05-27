@@ -13,7 +13,7 @@ let rec desugar_exp = function
   | IfExp (e1, e2, e3) -> CoreIfExp (desugar_exp e1, desugar_exp e2, desugar_exp e3)
   | LambdaExp (ids, e) -> CoreLambdaExp (ids, desugar_exp e, [])
   | AndExp lst -> List.map desugar_exp lst |> CoreAndExp
-  | OrExp lst -> List.map desugar_exp lst |> CoreOfExp
+  | OrExp lst -> List.map desugar_exp lst |> CoreOrExp
   | NotExp e -> desugar_exp e |> CoreNotExp
   | AppExp (e, lst) -> CoreAppExp (desugar_exp e, List.map desugar_exp lst)
   | SetExp (id, e) -> CoreSetExp (id, desugar_exp e)
@@ -60,11 +60,9 @@ and desugar_let e lst =
 and desugar_letrec defs e =
   let dummies _ = Constants.dummy_var in
   let params = List.map (fun (n, _, _) -> n) defs in
-  let mk_set_exp n p e = CoreSetExp (n, CoreLambdaExp (p, desugar_exp e, [])) in
+  let mk_set_exp (n, p, e) = CoreSetExp (n, CoreLambdaExp (p, desugar_exp e, [])) in
   let set_exps =
-    [ desugar_exp e ]
-    |> List.append (List.map (fun (n, p, e) -> mk_set_exp n p e) defs)
-    |> CoreBeginExp
+    [ desugar_exp e ] |> List.append (List.map mk_set_exp defs) |> CoreBeginExp
   in
   CoreAppExp (CoreLambdaExp (params, set_exps, []), List.map dummies params)
 
