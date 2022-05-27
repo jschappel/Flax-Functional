@@ -22,7 +22,7 @@ let rec desugar_exp = function
   | LetExp (lst, e) -> desugar_let e lst
   | ListExp lst -> desugar_list lst
   | VectorExp lst -> desugar_vector lst
-  | _ -> failwith "error"
+  | LetRecExp (defs, e) -> desugar_letrec defs e
 
 and desugar_list lst =
   CoreAppExp (CoreVarExp "emptylist", [])
@@ -56,6 +56,17 @@ and desugar_let e lst =
   let exps = List.map (fun (_, e) -> desugar_exp e) lst in
   let body = desugar_exp e in
   CoreAppExp (CoreLambdaExp (params, body, []), exps)
+
+and desugar_letrec defs e =
+  let dummies _ = Constants.dummy_var in
+  let params = List.map (fun (n, _, _) -> n) defs in
+  let mk_set_exp n p e = CoreSetExp (n, CoreLambdaExp (p, desugar_exp e, [])) in
+  let set_exps =
+    [ desugar_exp e ]
+    |> List.append (List.map (fun (n, p, e) -> mk_set_exp n p e) defs)
+    |> CoreBeginExp
+  in
+  CoreAppExp (CoreLambdaExp (params, set_exps, []), List.map dummies params)
 
 and desugar_cond lst =
   let rec helper = function

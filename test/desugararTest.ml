@@ -114,6 +114,40 @@ let desugar_vector_exps _ =
              [] ),
          [ CoreAppExp (CoreVarExp "allocate-array", [ CoreNumExp 3. ]) ] ))
 
+let desugar_letrec_exps _ =
+  core_exp_eq
+    "(define x (letrec ((define (is-even? n) true)   (define (is-odd? n) false)) \
+     (is-odd? 11)))"
+    (CoreAppExp
+       ( CoreLambdaExp
+           ( [ "is-even?"; "is-odd?" ],
+             CoreBeginExp
+               [
+                 CoreSetExp ("is-even?", CoreLambdaExp ([ "n" ], CoreBoolExp true, []));
+                 CoreSetExp ("is-odd?", CoreLambdaExp ([ "n" ], CoreBoolExp false, []));
+                 CoreAppExp (CoreVarExp "is-odd?", [ CoreNumExp 11. ]);
+               ],
+             [] ),
+         [ CoreNumExp 42.; CoreNumExp 42. ] ));
+  core_exp_eq
+    "(define x (letrec ((define (is-even? n z) true)   (define (is-odd? n z y) false)) \
+     (is-odd? 11 12 13)))"
+    (CoreAppExp
+       ( CoreLambdaExp
+           ( [ "is-even?"; "is-odd?" ],
+             CoreBeginExp
+               [
+                 CoreSetExp
+                   ("is-even?", CoreLambdaExp ([ "n"; "z" ], CoreBoolExp true, []));
+                 CoreSetExp
+                   ("is-odd?", CoreLambdaExp ([ "n"; "z"; "y" ], CoreBoolExp false, []));
+                 CoreAppExp
+                   ( CoreVarExp "is-odd?",
+                     [ CoreNumExp 11.; CoreNumExp 12.; CoreNumExp 13. ] );
+               ],
+             [] ),
+         [ CoreNumExp 42.; CoreNumExp 42. ] ))
+
 let suite =
   "Desugarar tests"
   >::: [
@@ -122,6 +156,7 @@ let suite =
          "Desugar Cond" >:: desugar_cond_exps;
          "Desugar List" >:: desugar_list_exps;
          "Desugar Vector" >:: desugar_vector_exps;
+         "Desugar Letrec" >:: desugar_letrec_exps;
        ]
 
 let _ = run_test_tt_main suite

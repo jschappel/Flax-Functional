@@ -10,7 +10,7 @@ Defines in the form `(define (x ...) ...)` are desugared into a lambda expressio
 ```
 
 
-### Cond
+#### Cond
 Cond expressions are broken down into nested if conditionals. If just a `else` case is provided then it just becomes an expression. If no case can be matched then `void` is returned.
 ```racket
 ; --- Case 1: ---
@@ -72,7 +72,8 @@ Vector expressions are desugared into a application expression where the proc is
  ('allocate-array 3))
 ```
 
-### Let
+
+#### Let
 Let expressions are desugared into an application expression where the operator is a lambda expression, whose body is the body of the let expression, and the operands are the values assigned to the let declarations. 
 
 ```racket 
@@ -84,4 +85,30 @@ Let expressions are desugared into an application expression where the operator 
 ((lambda (x y) (+ x y))
  10
  (- 20 30))
+```
+
+
+#### Letrec
+Letrec expressions are desugared into an application expression where the operator is a lambda expression whose params are the functions in the letrec and, whose body is a list of set expressions where each set expression sets the lambda param to the body of the letrec function. The params to the application expression are trash values and are reset inside the lambda. 
+
+
+```racket 
+
+(letrec ((define (is-even? n)
+                 (or (zero? n)
+                     (is-odd? (sub1 n))))
+               (define (is-odd? n)
+                 (and (not (zero? n))
+                      (is-even? (sub1 n)))))
+        (is-odd? 11))
+
+
+; After desugaring becomes
+((lambda (is-even? is-odd?)
+       (begin
+         (set! is-even? (lambda (n) (or (zero? n) (is-odd? (sub1 n)))))
+         (set! is-odd? (lambda (n) (and (not (zero? n)) (is-even? (sub1 n)))))
+         (is-odd? 11)))
+     42
+     42)
 ```

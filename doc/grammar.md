@@ -107,10 +107,6 @@ CoreIfExp       ::= <CoreExp> <CoreExp> <CoreExp>
 
 CoreLambdaExp   ::=  <CoreVar>*  <CoreExp> <CoreVar>*
 
-CoreLetExp      ::=  (<CoreLetDeclExp>)*  <CoreExp>
-
-CoreLetDeclExp  ::= CoreVar CoreExp
-
 CoreAndExp      ::= <CoreExp>* 
 
 CoreOrExp       ::= <CoreExp>* 

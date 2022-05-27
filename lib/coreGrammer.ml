@@ -38,9 +38,6 @@ type core_exp =
   (* A CoreBeginExp is a list of expressions representing the expressions that are
      evaluated in the begin *)
   | CoreBeginExp of core_exp list
-  (* A CoreLetExp is a list of let declarations and an exp representing the body of the
-     let *)
-  | CoreLetExp of core_let_decl * core_exp
 
 (** A core_let_decl is a variable to be declared and a definition for it *)
 and core_let_decl = string * core_exp
