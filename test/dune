@@ -1,7 +1,7 @@
 ;; see https://github.com/gildor478/ounit/tree/master/examples for test examples
 
 (tests
- (names parserTest desugararTest)
+ (names parserTest desugararTest cpsTest)
  (action
   (run %{test} -ci=true))
  (libraries ounit2 flax_core))

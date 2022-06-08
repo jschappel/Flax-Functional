@@ -5,11 +5,11 @@ open Flax_environment
 module SymGen = struct
   let counter = ref 0
 
-  let gen_sym =
+  let gen_sym () =
     counter := !counter + 1;
     Printf.sprintf "v%d" !counter
 
-  let reset = counter := 0
+  let reset () = counter := 0
 end
 
 let gen_cont_name = Printf.sprintf "%s/k"
@@ -114,7 +114,7 @@ and cps_exp exp k =
     match k with
     | CoreVarExp _ -> CoreAppExp (k, [ exp ])
     | CoreLambdaExp (p :: _, b, _) when occurs_free p b -> CoreAppExp (k, [ exp ])
-    | CoreLambdaExp (__, b, _) -> b
+    | CoreLambdaExp (_, b, _) -> b
     | _ -> failwith "Unreachable"
   in
   match exp with
@@ -125,7 +125,7 @@ and cps_exp exp k =
       match get_fist_non_tailcall e1 with
       | None -> CoreIfExp (e1, cps_exp e2 k, cps_exp e3 k)
       | Some e ->
-          let k_param = SymGen.gen_sym in
+          let k_param = SymGen.gen_sym () in
           let new_e1 = sub_exp e (CoreVarExp k_param) e1 in
           CoreLambdaExp ([ k_param ], cps_exp (CoreIfExp (new_e1, e2, e3)) k, [])
           |> cps_exp e)
@@ -133,13 +133,44 @@ and cps_exp exp k =
       let new_params = List.append p [ "$k$" ] in
       CoreAppExp
         (k, [ CoreLambdaExp (new_params, cps_exp b Constants.continuation_var, []) ])
-  | _ -> Todo.unimplimented ()
+  | CoreAppExp (rator, rands) -> (
+      match get_fist_non_tailcall rator with
+      | Some rator ->
+          (* When not in tail call cps the operator and create a new closure whose body is
+             the cps'ed expression of substituting the operator with the variable that
+             represents its value *)
+          let k_param = SymGen.gen_sym () in
+          let body = cps_exp (sub_exp rator (CoreVarExp k_param) exp) k in
+          CoreLambdaExp ([ k_param ], body, []) |> cps_exp rator
+      | None -> (
+          (* If op is lambda-exp then add the cont param and cps the body *)
+          let new_rator =
+            match rator with
+            | CoreLambdaExp (p, b, _) ->
+                CoreLambdaExp (p @ [ "$k$" ], cps_exp b Constants.continuation_var, [])
+            | _ -> rator
+          in
+          match (get_fist_non_tailcall_in_list rands, rator) with
+          | None, CoreVarExp r when Env.Enviroment.is_prim r ->
+              (* Update lambdas if any...*)
+              CoreAppExp (k, [ CoreAppExp (new_rator, update_lambdas rands) ])
+          | None, _ ->
+              (* Update lambdas if any...*)
+              CoreAppExp (new_rator, update_lambdas rands @ [ k ])
+          | Some fnt, _ ->
+              let k_param = SymGen.gen_sym () in
+              let body = cps_exp (sub_exp fnt (CoreVarExp k_param) exp) k in
+              cps_exp exp (CoreLambdaExp ([ k_param ], body, []))))
+  | CoreBeginExp _exps -> failwith "TODO: Unimpilmented"
+  | CoreSetExp (_i, _e) -> failwith "TODO: Unimpilmented"
 
 and mk_cps_exp target_exp k =
   match get_fist_non_tailcall target_exp with
   | None -> CoreAppExp (k, [ target_exp ])
   | Some victim ->
-      let k_param = SymGen.gen_sym in
+      let k_param = SymGen.gen_sym () in
       cps_exp victim
         (CoreLambdaExp
            ([ k_param ], cps_exp (sub_exp victim (CoreVarExp k_param) target_exp) k, []))
+
+and update_lambdas _exp_lst = Todo.unimplimented ()
