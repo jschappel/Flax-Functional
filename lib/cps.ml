@@ -1,5 +1,4 @@
 open CoreGrammer
-open Utils
 open Flax_environment
 
 module SymGen = struct
@@ -80,30 +79,39 @@ let sub_exp old_e new_e target_e =
   | CoreSetExp (t, _) -> CoreSetExp (t, new_e)
   | CoreFreeVarExp _ -> failwith "Unreachable"
 
-let rec cps_prog (CoreProg defs) =
-  let decide_cps d =
+let rec cps_program (CoreProg defs) =
+  let decide_cps d : core_def list =
     match d with
-    | CoreDef (n, (CoreLambdaExp (_, _, _) as l)) -> cps_def_lambda n l
-    | _ -> Todo.unimplimented ()
+    | CoreDef (n, (CoreLambdaExp (_, _, _) as l)) -> cps_def_exp n l
+    | CoreDef (n, e) ->
+        let draft_exp = cps_exp e Constants.end_cont in
+        let new_exp =
+          match draft_exp with
+          | CoreAppExp (rator, x :: _) when equal_core_exp rator Constants.end_cont -> x
+          | _ -> draft_exp
+        in
+        [ CoreDef (n, new_exp) ]
   in
   List.map decide_cps defs |> List.flatten |> CoreProg
 
-and cps_def_lambda name (CoreLambdaExp (params, body, _)) =
-  let mk_core_var p = CoreVarExp p in
-  let new_name = gen_cont_name name in
-  let exp_1 =
-    CoreLambdaExp
-      ( params,
-        CoreAppExp
-          ( CoreVarExp new_name,
-            [ Constants.end_cont ] |> List.append (List.map mk_core_var params) ),
-        [] )
-  in
-  let cps_exp_1 =
-    CoreLambdaExp
-      (List.append params [ "$k$" ], cps_exp body Constants.continuation_var, [])
-  in
-  [ CoreDef (name, exp_1); CoreDef (new_name, cps_exp_1) ]
+and cps_def_exp name = function
+  | CoreLambdaExp (params, body, _) ->
+      let mk_core_var p = CoreVarExp p in
+      let new_name = gen_cont_name name in
+      let exp_1 =
+        CoreLambdaExp
+          ( params,
+            CoreAppExp
+              ( CoreVarExp new_name,
+                [ Constants.end_cont ] |> List.append (List.map mk_core_var params) ),
+            [] )
+      in
+      let cps_exp_1 =
+        CoreLambdaExp
+          (List.append params [ "$k$" ], cps_exp body Constants.continuation_var, [])
+      in
+      [ CoreDef (name, exp_1); CoreDef (new_name, cps_exp_1) ]
+  | _ -> failwith "Unreachable"
 
 (* Pull out the first expression that has a nontail call if it exists. CPS this expression
    with a new cont where said expression is substituted with the parameter of the new
@@ -161,8 +169,40 @@ and cps_exp exp k =
               let k_param = SymGen.gen_sym () in
               let body = cps_exp (sub_exp fnt (CoreVarExp k_param) exp) k in
               cps_exp exp (CoreLambdaExp ([ k_param ], body, []))))
-  | CoreBeginExp _exps -> failwith "TODO: Unimpilmented"
-  | CoreSetExp (_i, _e) -> failwith "TODO: Unimpilmented"
+  | CoreSetExp (_, _) as exp -> (
+      match (get_fist_non_tailcall exp, k) with
+      | ( Some fnt,
+          CoreLambdaExp
+            ((p :: _ as k_params), CoreAppExp (k_rator, CoreBeginExp k_begin_exps :: _), _)
+        ) ->
+          let lambda_body =
+            CoreAppExp
+              (k_rator, [ CoreBeginExp (sub_exp fnt (CoreVarExp p) exp :: k_begin_exps) ])
+          in
+          CoreLambdaExp (k_params, lambda_body, []) |> cps_exp fnt
+      | _, _ -> mk_cps_exp exp k)
+  | CoreBeginExp exps -> (
+      match get_fist_non_tailcall_in_list exps with
+      | None -> CoreAppExp (Constants.continuation_var, [ exp ])
+      | Some fnt -> (
+          (* exps before frist non tail call *)
+          let before = extract_list_prefix fnt exps in
+          (* exps after first non tail call *)
+          let after = extract_list_suffix fnt exps in
+          match (before, after) with
+          | [], _ :: _ ->
+              let k_param = SymGen.gen_sym () in
+              let cont_body = cps_exp (CoreBeginExp after) k in
+              CoreLambdaExp ([ k_param ], cont_body, [])
+          | _ :: _, _ :: _ ->
+              (* If there is a before then we need to begin with before and the result of
+                 cpsing fnt, then cps after in a begin exp with the new continuation *)
+              let k_param = SymGen.gen_sym () in
+              let cps_after = cps_exp (CoreBeginExp after) k in
+              let cps_before = cps_exp fnt (CoreLambdaExp ([ k_param ], cps_after, [])) in
+              CoreBeginExp (List.append before [ cps_before ])
+          | _ -> failwith "Unreachable"))
+  | CoreFreeVarExp (_, _) -> failwith "Unreachable"
 
 and mk_cps_exp target_exp k =
   match get_fist_non_tailcall target_exp with
@@ -173,4 +213,24 @@ and mk_cps_exp target_exp k =
         (CoreLambdaExp
            ([ k_param ], cps_exp (sub_exp victim (CoreVarExp k_param) target_exp) k, []))
 
-and update_lambdas _exp_lst = Todo.unimplimented ()
+and update_lambdas exps =
+  List.map
+    (function
+      | CoreLambdaExp (p, b, _) ->
+          CoreLambdaExp (List.append p [ "$k$" ], cps_exp b Constants.continuation_var, [])
+      | _ as exp -> exp)
+    exps
+
+(* Precondition: The given core-exp is in the given list of core-exp *)
+and extract_list_prefix exp exps =
+  match exps with
+  | x :: _ when equal_core_exp x exp -> []
+  | x :: xs -> x :: extract_list_prefix exp xs
+  | _ -> failwith "Expeted exp to be in list of expressions"
+
+(* Precondition: The given core-exp is in the given list of core-exp *)
+and extract_list_suffix exp exps =
+  match exps with
+  | x :: xs when equal_core_exp x exp -> xs
+  | _ :: xs -> extract_list_suffix exp xs
+  | _ -> failwith "Expected exp to be in the list of expressions"

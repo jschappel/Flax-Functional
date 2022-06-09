@@ -27,7 +27,8 @@ let () =
       | Some "exit" -> exit 0
       | Some line ->
           Parser.parse_program line
-          |> Parser.show_program
+          |> Desugarar.desugar_program
+          |> Build.show_core_prog
           |> Out_channel.print_endline (* @@ run_env line *)
       | None -> Out_channel.print_endline "NULL"
     done
