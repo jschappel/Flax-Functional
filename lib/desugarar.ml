@@ -82,4 +82,3 @@ let desugar_def = function
   | DefFunc (n, ids, e) -> CoreDef (n, CoreLambdaExp (ids, desugar_exp e, []))
 
 let desugar_program (Program defs) = List.map desugar_def defs |> CoreProg
-

@@ -7,8 +7,7 @@ module Build = struct
   let run_prog prog =
     prog |> Parser.parse_program |> Desugarar.desugar_program |> Cps.cps_program
 
-  let show_core_prog core_prog =  
-    CoreGrammer.show_core_prog core_prog
+  let show_core_prog core_prog = CoreGrammer.show_core_prog core_prog
 end
 
 module Test = struct

@@ -26,8 +26,7 @@ let () =
       match In_channel.input_line stdin with
       | Some "exit" -> exit 0
       | Some line ->
-          Parser.parse_program line
-          |> Desugarar.desugar_program
+          Build.run_prog line
           |> Build.show_core_prog
           |> Out_channel.print_endline (* @@ run_env line *)
       | None -> Out_channel.print_endline "NULL"
