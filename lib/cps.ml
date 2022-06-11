@@ -1,4 +1,4 @@
-open CoreGrammer
+open Grammer.CoreGrammer
 open Flax_environment
 
 module SymGen = struct

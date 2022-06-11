@@ -32,6 +32,7 @@ _opam/
 flax_parser.opam
 flax_repl.opam
 flax_environment.opam
+flax_grammer.opam
 
 # VSCode
 .vscode

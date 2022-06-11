@@ -29,6 +29,13 @@
   ppx_deriving))
 
 (package 
+ (name flax_grammer)
+ (synopsis "The Core Grammar for the program")
+ (depends
+  core
+  ppx_deriving))
+
+(package 
  (name flax_core)
  (synopsis "Core functionality for the compiler")
  (depends

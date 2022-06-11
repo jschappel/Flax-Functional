@@ -14,4 +14,4 @@ let parse' f s =
 
 let parse_program s = parse' Parser.program s
 
-let show_program = Ast.show_program
+let show_program = Grammer.SourceGrammer.show_program

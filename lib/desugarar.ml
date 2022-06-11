@@ -1,5 +1,5 @@
-open Flax_parser.Ast
-open CoreGrammer
+open Grammer.SourceGrammer
+open Grammer.CoreGrammer
 
 (* A detailed explination of how each of the expression are desugared can be found in:
    `doc/desugar.md` *)

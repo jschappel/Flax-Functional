@@ -1,7 +1,7 @@
 (library
  (name flax_parser)
  (public_name flax_parser)
- (libraries core)
+ (libraries core grammer)
  (preprocess
   (pps ppx_deriving.show)))
 
