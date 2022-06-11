@@ -25,7 +25,7 @@ let rec get_fist_non_tailcall e =
   | CoreOrExp exps -> get_fist_non_tailcall_in_list exps
   | CoreAndExp exps -> get_fist_non_tailcall_in_list exps
   | CoreNotExp e1 -> get_fist_non_tailcall e1
-  | CoreAppExp (CoreVarExp r, rands) when Env.Enviroment.is_prim r ->
+  | CoreAppExp (CoreVarExp rator, rands) when Env.Enviroment.is_prim rator ->
       get_fist_non_tailcall_in_list rands
   | CoreAppExp (_, _) -> Some e
   | CoreVectorExp exps -> get_fist_non_tailcall_in_list exps
@@ -168,7 +168,7 @@ and cps_exp exp k =
           | Some fnt, _ ->
               let k_param = SymGen.gen_sym () in
               let body = cps_exp (sub_exp fnt (CoreVarExp k_param) exp) k in
-              cps_exp exp (CoreLambdaExp ([ k_param ], body, []))))
+              cps_exp fnt (CoreLambdaExp ([ k_param ], body, []))))
   | CoreSetExp (_, _) as exp -> (
       match (get_fist_non_tailcall exp, k) with
       | ( Some fnt,
