@@ -2,8 +2,8 @@ open OUnit2
 open Flax_core.Cps
 open Flax_core.Lib.Grammer.CoreGrammer
 
-(* Makes sure that the two programs are equivlent *)
-let assert_prog_eq (actual : string) (CoreProg expected) : unit =
+(* Makes sure that the given program is equal the the parse tree *)
+let assert_prog_eq_parse_tree (actual : string) (CoreProg expected) : unit =
   let rec helper actual expected =
     match (actual, expected) with
     | [], [] -> ()
@@ -16,14 +16,21 @@ let assert_prog_eq (actual : string) (CoreProg expected) : unit =
   let (CoreProg a_lst) = Flax_core.Lib.Build.run_prog actual in
   helper a_lst expected
 
+(* Converts the actual to a cps'ed program, while the expected is expected to be in cps
+   form and just converts it to a core program *)
+let assert_prog_eq (actual : string) (expected : string) : unit =
+  let open Flax_core.Lib in
+  let parsed_actual = Flax_core.Lib.Build.run_prog actual in
+  let parsed_expected = expected |> Parser.parse_program |> Desugarar.desugar_program in
+  assert_equal ~printer:show_core_prog parsed_actual parsed_expected
+
 let sym_gen_test _ =
   assert_equal "v1" (SymGen.gen_sym ());
   assert_equal "v2" (SymGen.gen_sym ());
-  assert_equal "v1" (SymGen.reset () |> SymGen.gen_sym);
-  SymGen.reset ()
+  assert_equal "v1" (SymGen.reset () |> SymGen.gen_sym)
 
 let cps_function_1 _ =
-  assert_prog_eq "(define (f x) 3)"
+  assert_prog_eq_parse_tree "(define (f x) 3)"
     (CoreProg
        [
          CoreDef
@@ -39,7 +46,7 @@ let cps_function_1 _ =
        ])
 
 let cps_function_2 _ =
-  assert_prog_eq "(define x 10) (define (f x) x)"
+  assert_prog_eq_parse_tree "(define x 10) (define (f x) x)"
     (CoreProg
        [
          CoreDef ("x", CoreNumExp 10.);
@@ -56,7 +63,7 @@ let cps_function_2 _ =
        ])
 
 let cps_function_3 _ =
-  assert_prog_eq "(define x 10) (define (f x) (lambda (x) x))"
+  assert_prog_eq_parse_tree "(define x 10) (define (f x) (lambda (x) x))"
     (CoreProg
        [
          CoreDef ("x", CoreNumExp 10.);
@@ -82,7 +89,7 @@ let cps_function_3 _ =
        ])
 
 let cps_function_4 _ =
-  assert_prog_eq "(define x 10) (define (f x) (lambda (x) (not x)))"
+  assert_prog_eq_parse_tree "(define x 10) (define (f x) (lambda (x) (not x)))"
     (CoreProg
        [
          CoreDef ("x", CoreNumExp 10.);
@@ -108,7 +115,7 @@ let cps_function_4 _ =
        ])
 
 let cps_function_5 _ =
-  assert_prog_eq "(define x 10) (define (f x) (g (h x)))"
+  assert_prog_eq_parse_tree "(define x 10) (define (f x) (g (h x)))"
     (CoreProg
        [
          CoreDef ("x", CoreNumExp 10.);
@@ -136,7 +143,7 @@ let cps_function_5 _ =
        ])
 
 let cps_function_6 _ =
-  assert_prog_eq "(define x 10) (define (f x) ((h x) 5))"
+  assert_prog_eq_parse_tree "(define x 10) (define (f x) ((h x) 5))"
     (CoreProg
        [
          CoreDef ("x", CoreNumExp 10.);
@@ -164,7 +171,7 @@ let cps_function_6 _ =
        ])
 
 let cps_function_7 _ =
-  assert_prog_eq "(define x 10) (define (f x) ((h x) (g (k 5))))"
+  assert_prog_eq_parse_tree "(define x 10) (define (f x) ((h x) (g (k 5))))"
     (CoreProg
        [
          CoreDef ("x", CoreNumExp 10.);

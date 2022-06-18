@@ -92,6 +92,7 @@ let rec cps_program (CoreProg defs) =
         in
         [ CoreDef (n, new_exp) ]
   in
+  SymGen.reset ();
   List.map decide_cps defs |> List.flatten |> CoreProg
 
 and cps_def_exp name = function
