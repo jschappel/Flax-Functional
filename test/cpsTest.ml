@@ -24,11 +24,6 @@ let assert_prog_eq (actual : string) (expected : string) : unit =
   let parsed_expected = expected |> Parser.parse_program |> Desugarar.desugar_program in
   assert_equal ~printer:show_core_prog parsed_actual parsed_expected
 
-let sym_gen_test _ =
-  assert_equal "v1" (SymGen.gen_sym ());
-  assert_equal "v2" (SymGen.gen_sym ());
-  assert_equal "v1" (SymGen.reset () |> SymGen.gen_sym)
-
 let cps_function_1 _ =
   assert_prog_eq_parse_tree "(define (f x) 3)"
     (CoreProg
@@ -134,9 +129,9 @@ let cps_function_5 _ =
                      [
                        CoreVarExp "x";
                        CoreLambdaExp
-                         ( [ "v1" ],
+                         ( [ "v0" ],
                            CoreAppExp
-                             (CoreVarExp "g", [ CoreVarExp "v1"; CoreVarExp "$k$" ]),
+                             (CoreVarExp "g", [ CoreVarExp "v0"; CoreVarExp "$k$" ]),
                            [] );
                      ] ),
                  [] ) );
@@ -162,9 +157,9 @@ let cps_function_6 _ =
                      [
                        CoreVarExp "x";
                        CoreLambdaExp
-                         ( [ "v1" ],
+                         ( [ "v0" ],
                            CoreAppExp
-                             (CoreVarExp "v1", [ CoreNumExp 5.; CoreVarExp "$k$" ]),
+                             (CoreVarExp "v0", [ CoreNumExp 5.; CoreVarExp "$k$" ]),
                            [] );
                      ] ),
                  [] ) );
@@ -190,22 +185,22 @@ let cps_function_7 _ =
                      [
                        CoreVarExp "x";
                        CoreLambdaExp
-                         ( [ "v1" ],
+                         ( [ "v0" ],
                            CoreAppExp
                              ( CoreVarExp "k",
                                [
                                  CoreNumExp 5.;
                                  CoreLambdaExp
-                                   ( [ "v3" ],
+                                   ( [ "v2" ],
                                      CoreAppExp
                                        ( CoreVarExp "g",
                                          [
-                                           CoreVarExp "v3";
+                                           CoreVarExp "v2";
                                            CoreLambdaExp
-                                             ( [ "v2" ],
+                                             ( [ "v1" ],
                                                CoreAppExp
-                                                 ( CoreVarExp "v1",
-                                                   [ CoreVarExp "v2"; CoreVarExp "$k$" ]
+                                                 ( CoreVarExp "v0",
+                                                   [ CoreVarExp "v1"; CoreVarExp "$k$" ]
                                                  ),
                                                [] );
                                          ] ),
@@ -219,7 +214,6 @@ let cps_function_7 _ =
 let suite =
   "Cps tests"
   >::: [
-         "SymGen" >:: sym_gen_test;
          "Cps Basic Function 1" >:: cps_function_1;
          "Cps Basic Function 2" >:: cps_function_2;
          "Cps Basic Function 3" >:: cps_function_3;

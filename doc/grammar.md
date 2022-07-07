@@ -80,8 +80,6 @@ CoreExp         ::= <CoreNumExp>
                   | <CoreIfExp>
                   | <CoreCondExp>
                   | <CoreLambdaExp>
-                  | <CoreLetExp>
-                  | <CoreLetrecExp>
                   | <CoreAndExp>
                   | <CoreOrExp>
                   | <CoreNotExp>
@@ -123,3 +121,5 @@ CoreSetExp      ::= <Var> <Exp>
 
 CoreBeginExp    ::= <Exp>* 
 ```
+
+where `CoreFreeVarExp` is introduced during `Free Var Transformation`

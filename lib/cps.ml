@@ -1,15 +1,9 @@
 open Grammer.CoreGrammer
 open Flax_environment
 
-module SymGen = struct
-  let counter = ref 0
-
-  let gen_sym () =
-    counter := !counter + 1;
-    Printf.sprintf "v%d" !counter
-
-  let reset () = counter := 0
-end
+module ParamSymGen = Utils.Generator.SymGen (struct
+  let s = "v"
+end)
 
 let gen_cont_name = Printf.sprintf "%s/k"
 
@@ -92,7 +86,7 @@ let rec cps_program (CoreProg defs) =
         in
         [ CoreDef (n, new_exp) ]
   in
-  SymGen.reset ();
+  ParamSymGen.reset ();
   List.map decide_cps defs |> List.flatten |> CoreProg
 
 and cps_def_exp name = function
@@ -134,7 +128,7 @@ and cps_exp exp k =
       match get_fist_non_tailcall e1 with
       | None -> CoreIfExp (e1, cps_exp e2 k, cps_exp e3 k)
       | Some e ->
-          let k_param = SymGen.gen_sym () in
+          let k_param = ParamSymGen.gen_sym () in
           let new_e1 = sub_exp e (CoreVarExp k_param) e1 in
           CoreLambdaExp ([ k_param ], cps_exp (CoreIfExp (new_e1, e2, e3)) k, [])
           |> cps_exp e)
@@ -148,7 +142,7 @@ and cps_exp exp k =
           (* When not in tail call cps the operator and create a new closure whose body is
              the cps'ed expression of substituting the operator with the variable that
              represents its value *)
-          let k_param = SymGen.gen_sym () in
+          let k_param = ParamSymGen.gen_sym () in
           let body = cps_exp (sub_exp rator (CoreVarExp k_param) exp) k in
           CoreLambdaExp ([ k_param ], body, []) |> cps_exp rator
       | None -> (
@@ -167,7 +161,7 @@ and cps_exp exp k =
               (* Update lambdas if any...*)
               CoreAppExp (new_rator, update_lambdas rands @ [ k ])
           | Some fnt, _ ->
-              let k_param = SymGen.gen_sym () in
+              let k_param = ParamSymGen.gen_sym () in
               let body = cps_exp (sub_exp fnt (CoreVarExp k_param) exp) k in
               cps_exp fnt (CoreLambdaExp ([ k_param ], body, []))))
   | CoreSetExp (_, _) as exp -> (
@@ -192,13 +186,13 @@ and cps_exp exp k =
           let after = extract_list_suffix fnt exps in
           match (before, after) with
           | [], _ :: _ ->
-              let k_param = SymGen.gen_sym () in
+              let k_param = ParamSymGen.gen_sym () in
               let cont_body = cps_exp (CoreBeginExp after) k in
               CoreLambdaExp ([ k_param ], cont_body, [])
           | _ :: _, _ :: _ ->
               (* If there is a before then we need to begin with before and the result of
                  cpsing fnt, then cps after in a begin exp with the new continuation *)
-              let k_param = SymGen.gen_sym () in
+              let k_param = ParamSymGen.gen_sym () in
               let cps_after = cps_exp (CoreBeginExp after) k in
               let cps_before = cps_exp fnt (CoreLambdaExp ([ k_param ], cps_after, [])) in
               CoreBeginExp (List.append before [ cps_before ])
@@ -209,7 +203,7 @@ and mk_cps_exp target_exp k =
   match get_fist_non_tailcall target_exp with
   | None -> CoreAppExp (k, [ target_exp ])
   | Some victim ->
-      let k_param = SymGen.gen_sym () in
+      let k_param = ParamSymGen.gen_sym () in
       cps_exp victim
         (CoreLambdaExp
            ([ k_param ], cps_exp (sub_exp victim (CoreVarExp k_param) target_exp) k, []))

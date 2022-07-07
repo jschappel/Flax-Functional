@@ -33,7 +33,6 @@ type core_exp =
   | CoreStrExp of string
   | CoreSymExp of string
   | CoreVarExp of string
-  | CoreFreeVarExp of string * int
   | CoreIfExp of core_exp * core_exp * core_exp
   | CoreLambdaExp of string list * core_exp * string list
   | CoreAndExp of core_exp list
@@ -44,9 +43,8 @@ type core_exp =
   | CoreListExp of core_exp list
   | CoreSetExp of string * core_exp
   | CoreBeginExp of core_exp list
-
-(** A core_let_decl is a variable to be declared and a definition for it *)
-and core_let_decl = string * core_exp
+  (* Below are introduced during free var transformation *)
+  | CoreFreeVarExp of string * int
 
 (** A variable is an identifier represented as a string *)
 and identifier = string [@@deriving show, eq]

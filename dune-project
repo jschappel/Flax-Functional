@@ -36,6 +36,13 @@
   ppx_deriving))
 
 (package 
+ (name utils)
+ (synopsis "Utility Functions for the compiler")
+ (depends
+  core))
+
+
+(package 
  (name flax_core)
  (synopsis "Core functionality for the compiler")
  (depends

@@ -29,10 +29,6 @@ setup.log
 _opam/
 
 # Ignore other opam files
-flax_parser.opam
-flax_repl.opam
-flax_environment.opam
-flax_grammer.opam
-
+*.opam
 # VSCode
 .vscode
