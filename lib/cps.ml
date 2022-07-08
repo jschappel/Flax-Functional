@@ -1,4 +1,4 @@
-open Grammer.CoreGrammer
+open Grammar.CoreGrammar
 open Flax_environment
 
 module ParamSymGen = Utils.Generator.SymGen (struct

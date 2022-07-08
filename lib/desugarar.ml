@@ -1,5 +1,5 @@
-open Grammer.SourceGrammer
-open Grammer.CoreGrammer
+open Grammar.SourceGrammar
+open Grammar.CoreGrammar
 
 (* A detailed explination of how each of the expression are desugared can be found in:
    `doc/desugar.md` *)

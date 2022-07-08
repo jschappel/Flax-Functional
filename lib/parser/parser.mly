@@ -1,5 +1,5 @@
 %{
-  open Grammer.SourceGrammer
+  open Grammar.SourceGrammar
 %}
 
 
@@ -27,7 +27,7 @@
 %token ELSE
 %token EOF
 
-%type <Grammer.SourceGrammer.program> program
+%type <Grammar.SourceGrammar.program> program
 %start program
 
 %%

@@ -29,7 +29,7 @@
   ppx_deriving))
 
 (package 
- (name flax_grammer)
+ (name flax_grammar)
  (synopsis "The Core Grammar for the program")
  (depends
   core

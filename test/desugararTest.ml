@@ -1,5 +1,5 @@
 open OUnit2
-open Flax_core.Lib.Grammer.CoreGrammer
+open Flax_core.Lib.Grammar.CoreGrammar
 open Flax_core.Desugarar
 
 (* Checks if two core programs are equivalent to one another *)

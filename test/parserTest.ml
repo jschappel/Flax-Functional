@@ -1,6 +1,6 @@
 open OUnit2
 open Flax_core.Lib.Parser
-open Flax_core.Lib.Grammer.SourceGrammer
+open Flax_core.Lib.Grammar.SourceGrammar
 
 (* Checks if two programs are equivalent to one another *)
 let prog_eq (s : string) (v : 'a) : unit =

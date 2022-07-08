@@ -1,12 +1,12 @@
 (* This file contaiens constants used throughout the compiler *)
 
 (** When given *)
-let void_cond_exp = Grammer.CoreGrammer.CoreVarExp "$$VOID$$"
+let void_cond_exp = Grammar.CoreGrammar.CoreVarExp "$$VOID$$"
 
-let placeholder_var = Grammer.CoreGrammer.CoreVarExp "$V$"
+let placeholder_var = Grammar.CoreGrammar.CoreVarExp "$V$"
 
-let dummy_var = Grammer.CoreGrammer.CoreNumExp 42.
+let dummy_var = Grammar.CoreGrammar.CoreNumExp 42.
 
-let continuation_var = Grammer.CoreGrammer.CoreVarExp "$k$"
+let continuation_var = Grammar.CoreGrammar.CoreVarExp "$k$"
 
-let end_cont = Grammer.CoreGrammer.CoreVarExp "end-k"
+let end_cont = Grammar.CoreGrammar.CoreVarExp "end-k"

@@ -1,6 +1,5 @@
 open OUnit2
-open Flax_core.Cps
-open Flax_core.Lib.Grammer.CoreGrammer
+open Flax_core.Lib.Grammar.CoreGrammar
 
 (* Makes sure that the given program is equal the the parse tree *)
 let assert_prog_eq_parse_tree (actual : string) (CoreProg expected) : unit =
@@ -13,14 +12,19 @@ let assert_prog_eq_parse_tree (actual : string) (CoreProg expected) : unit =
         helper xs ys
     | _ -> failwith "List lengths are not equal"
   in
-  let (CoreProg a_lst) = Flax_core.Lib.Build.run_prog actual in
+  let open Flax_core.Lib in
+  let (CoreProg a_lst) =
+    actual |> Parser.parse_program |> Desugarar.desugar_program |> Cps.cps_program
+  in
   helper a_lst expected
 
 (* Converts the actual to a cps'ed program, while the expected is expected to be in cps
    form and just converts it to a core program *)
 let assert_prog_eq (actual : string) (expected : string) : unit =
   let open Flax_core.Lib in
-  let parsed_actual = Flax_core.Lib.Build.run_prog actual in
+  let parsed_actual =
+    actual |> Parser.parse_program |> Desugarar.desugar_program |> Cps.cps_program
+  in
   let parsed_expected = expected |> Parser.parse_program |> Desugarar.desugar_program in
   assert_equal ~printer:show_core_prog parsed_actual parsed_expected
 
