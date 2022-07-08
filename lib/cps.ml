@@ -7,10 +7,6 @@ end)
 
 let gen_cont_name = Printf.sprintf "%s/k"
 
-let rec ormap cond = function
-  | [] -> false
-  | x :: xs -> if cond x then true else ormap cond xs
-
 let rec get_fist_non_tailcall e =
   match e with
   | CoreNumExp _ | CoreSymExp _ | CoreStrExp _ | CoreVarExp _ | CoreBoolExp _ -> None
@@ -35,20 +31,23 @@ and get_fist_non_tailcall_in_list = function
       | Some _ -> Some x
       | None -> get_fist_non_tailcall_in_list xs)
 
-let rec occurs_free var = function
+let rec occurs_free var exp =
+  let open Utils in
+  match exp with
   | CoreNumExp _ | CoreBoolExp _ | CoreSymExp _ | CoreStrExp _ -> false
   | CoreVarExp v -> String.equal v var
   | CoreIfExp (e1, e2, e3) ->
       occurs_free var e1 || occurs_free var e2 || occurs_free var e3
   | CoreLambdaExp (p, b, _) -> (not @@ List.mem var p) && occurs_free var b
-  | CoreOrExp exps -> ormap (occurs_free var) exps
-  | CoreAndExp exps -> ormap (occurs_free var) exps
+  | CoreOrExp exps -> ListUtils.ormap (occurs_free var) exps
+  | CoreAndExp exps -> ListUtils.ormap (occurs_free var) exps
   | CoreNotExp e -> occurs_free var e
-  | CoreAppExp (r, rands) -> [ r ] |> List.append rands |> ormap (occurs_free var)
-  | CoreVectorExp exps -> ormap (occurs_free var) exps
-  | CoreListExp exps -> ormap (occurs_free var) exps
+  | CoreAppExp (r, rands) ->
+      [ r ] |> List.append rands |> ListUtils.ormap (occurs_free var)
+  | CoreVectorExp exps -> ListUtils.ormap (occurs_free var) exps
+  | CoreListExp exps -> ListUtils.ormap (occurs_free var) exps
   | CoreSetExp (_, e) -> occurs_free var e
-  | CoreBeginExp exps -> ormap (occurs_free var) exps
+  | CoreBeginExp exps -> ListUtils.ormap (occurs_free var) exps
   | CoreFreeVarExp _ -> failwith "Unreachable"
 
 (* replaces the old expression with the new expression inside the target *)
