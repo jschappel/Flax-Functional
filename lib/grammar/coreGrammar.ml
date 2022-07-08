@@ -1,7 +1,5 @@
 (* This File contains the compiler internal representation of the grammar. This is the
-   final form of the grammar and is generated after desugaring the program.
-*)
-
+   final form of the grammar and is generated after desugaring the program. *)
 
 type core_exp =
   | CoreNumExp of float
