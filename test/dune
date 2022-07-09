@@ -1,7 +1,12 @@
 ;; see https://github.com/gildor478/ounit/tree/master/examples for test examples
 
 (tests
- (names parserTest desugararTest cpsTest generatorTest freevarTransformerTest)
+ (names
+  parserTest
+  desugararTest
+  cpsTest
+  generatorTest
+  freevarTransformerTest)
  (action
   (run %{test}))
  ;-ci=true))

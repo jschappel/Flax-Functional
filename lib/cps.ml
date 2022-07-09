@@ -5,6 +5,8 @@ module ParamSymGen = Utils.Generator.SymGen (struct
   let s = "v"
 end)
 
+let prim_env = PrimEnvironment.new_env ()
+
 let gen_cont_name = Printf.sprintf "%s/k"
 
 let rec get_fist_non_tailcall e =
@@ -15,7 +17,7 @@ let rec get_fist_non_tailcall e =
   | CoreOrExp exps -> get_fist_non_tailcall_in_list exps
   | CoreAndExp exps -> get_fist_non_tailcall_in_list exps
   | CoreNotExp e1 -> get_fist_non_tailcall e1
-  | CoreAppExp (CoreVarExp rator, rands) when PrimEnvironment.contains rator ->
+  | CoreAppExp (CoreVarExp rator, rands) when PrimEnvironment.contains rator prim_env ->
       get_fist_non_tailcall_in_list rands
   | CoreAppExp (_, _) -> Some e
   | CoreVectorExp exps -> get_fist_non_tailcall_in_list exps
@@ -153,7 +155,7 @@ and cps_exp exp k =
             | _ -> rator
           in
           match (get_fist_non_tailcall_in_list rands, rator) with
-          | None, CoreVarExp r when PrimEnvironment.contains r ->
+          | None, CoreVarExp r when PrimEnvironment.contains r prim_env ->
               (* Update lambdas if any...*)
               CoreAppExp (k, [ CoreAppExp (new_rator, update_lambdas rands) ])
           | None, _ ->

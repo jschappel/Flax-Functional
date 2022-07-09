@@ -1,0 +1,11 @@
+(library
+ (name environment)
+ (public_name flax_environment)
+ (libraries core utils)
+ (preprocess
+  (pps ppx_jane ppx_deriving.show ppx_deriving.eq)))
+
+(env
+ (dev
+  (flags
+   (:standard -warn-error -A))))

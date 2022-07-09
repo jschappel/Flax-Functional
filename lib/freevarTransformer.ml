@@ -9,7 +9,6 @@ let freevar_transform_def (CoreDef (id, exp)) =
 let freevar_transfom_program (CoreProg defs) =
   defs |> List.map freevar_transform_def |> CoreProg
 
-
 let rec occurs_free var exp =
   let open Utils in
   match exp with
