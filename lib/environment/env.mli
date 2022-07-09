@@ -1,4 +1,4 @@
-module type Env = sig
+module type ENV = sig
   (** The type of a environment variable *)
   type key
 
@@ -18,7 +18,7 @@ module type Env = sig
 end
 
 (** Enviroment containing the primitive functions *)
-module PrimEnvironment : Env with type key = string
+module PrimEnvironment : ENV with type key = string
 
 (** Environnment containing the alpha coonversion variables *)
-module AlphaEnvironment : Env
+module AlphaEnvironment : ENV with type key = string

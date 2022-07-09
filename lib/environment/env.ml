@@ -1,4 +1,4 @@
-module type Env = sig
+module type ENV = sig
   type key
   type 'a t
 
@@ -8,7 +8,7 @@ module type Env = sig
   val contains : key -> 'a t -> bool
 end
 
-module PrimEnvironment : Env with type key = string = struct
+module PrimEnvironment : ENV with type key = string = struct
   type key = string
   type 'a t = (key, int option, Base.String.comparator_witness) Base.Map.t list
 
@@ -35,7 +35,7 @@ module PrimEnvironment : Env with type key = string = struct
   ;;
 end
 
-module AlphaEnvironment : Env with type key = string = struct
+module AlphaEnvironment : ENV with type key = string = struct
   type key = string
 
   type 'a t =
