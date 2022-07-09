@@ -1,6 +1,6 @@
 
 
-## Source Grammer
+## Source Grammar
 ```shell
 Program ::= <Def>+
 

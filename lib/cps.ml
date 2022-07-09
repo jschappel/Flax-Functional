@@ -1,5 +1,5 @@
 open Grammar.CoreGrammar
-open Flax_environment
+open Environment.Env
 
 module ParamSymGen = Utils.Generator.SymGen (struct
   let s = "v"
@@ -15,7 +15,7 @@ let rec get_fist_non_tailcall e =
   | CoreOrExp exps -> get_fist_non_tailcall_in_list exps
   | CoreAndExp exps -> get_fist_non_tailcall_in_list exps
   | CoreNotExp e1 -> get_fist_non_tailcall e1
-  | CoreAppExp (CoreVarExp rator, rands) when Env.Enviroment.is_prim rator ->
+  | CoreAppExp (CoreVarExp rator, rands) when PrimEnvironment.contains rator ->
       get_fist_non_tailcall_in_list rands
   | CoreAppExp (_, _) -> Some e
   | CoreVectorExp exps -> get_fist_non_tailcall_in_list exps
@@ -153,7 +153,7 @@ and cps_exp exp k =
             | _ -> rator
           in
           match (get_fist_non_tailcall_in_list rands, rator) with
-          | None, CoreVarExp r when Env.Enviroment.is_prim r ->
+          | None, CoreVarExp r when PrimEnvironment.contains r ->
               (* Update lambdas if any...*)
               CoreAppExp (k, [ CoreAppExp (new_rator, update_lambdas rands) ])
           | None, _ ->
