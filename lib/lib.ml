@@ -3,6 +3,7 @@ module Parser = Flax_parser.ParserInterface
 module Desugarar = Desugarar
 module Cps = Cps
 module Grammar = Flax_grammar
+module Environment = Flax_environment.Env
 
 module Build = struct
   let run_prog prog =

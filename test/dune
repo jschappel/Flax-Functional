@@ -1,8 +1,9 @@
 ;; see https://github.com/gildor478/ounit/tree/master/examples for test examples
-
+(include_subdirs unqualified)
 (tests
  (names
   parserTest
+  environmentTest
   desugararTest
   cpsTest
   generatorTest

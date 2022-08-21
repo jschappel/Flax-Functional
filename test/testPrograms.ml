@@ -5,6 +5,6 @@
    interperet_program)
 
    let factorial _ = let actual = run_file "./programs/fact.flax" in assert_equal
-   ~printer:Enviroment.show_value (NumVal 120.0) actual
+   ~printer:Environment.show_value (NumVal 120.0) actual
 
    let suite = "AST" >::: [ "factorial" >:: factorial ] let () = run_test_tt_main suite *)
