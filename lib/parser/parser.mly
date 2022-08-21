@@ -1,5 +1,5 @@
 %{
-  open Grammar.SourceGrammar
+  open Flax_grammar.SourceGrammar
 %}
 
 
@@ -27,7 +27,7 @@
 %token ELSE
 %token EOF
 
-%type <Grammar.SourceGrammar.program> program
+%type <Flax_grammar.SourceGrammar.program> program
 %start program
 
 %%

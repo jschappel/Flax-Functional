@@ -1,4 +1,4 @@
-open Grammar.CoreGrammar
+open Flax_grammar.CoreGrammar
 open Utils.Generator
 
 module AlphaDefGen = SymGen (struct

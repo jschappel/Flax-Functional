@@ -1,6 +1,5 @@
 (library
- (name grammar)
- (public_name flax_grammar)
+ (name flax_grammar)
  (libraries core)
  (preprocess
   (pps ppx_jane ppx_deriving.show ppx_deriving.eq)))

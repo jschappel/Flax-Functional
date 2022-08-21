@@ -42,16 +42,21 @@ module AlphaEnvironment : ENV with type key = string = struct
     | Empty
     | ExtEnv of (key * 'a) list * 'a t
 
+  let get_value target (v, _) = String.equal target v
   let new_env () = Empty
   let ext k v env = ExtEnv ([ k, v ], env)
 
   let rec apply target = function
     | Empty -> None
     | ExtEnv (convs, env) ->
-      (match List.find_opt (fun (v, _) -> String.equal target v) convs with
-      | Some (_, a) -> Some a
-      | None -> apply target env)
+      (match List.find_opt (get_value target) convs with
+       | Some (_, a) -> Some a
+       | None -> apply target env)
   ;;
 
-  let contains s _ = failwith ""
+  let rec contains target = function
+    | ExtEnv (convs, ext_env) ->
+      if List.exists (get_value target) convs then true else contains target ext_env
+    | Empty -> false
+  ;;
 end

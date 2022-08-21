@@ -1,6 +1,5 @@
 (library
  (name utils)
- (public_name utils)
  (libraries core)
  (preprocess
   (pps ppx_jane ppx_deriving.show ppx_deriving.eq)))

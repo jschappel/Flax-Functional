@@ -1,5 +1,5 @@
-open Grammar.CoreGrammar
-open Environment.Env
+open Flax_grammar.CoreGrammar
+open Flax_environment.Env
 
 module ParamSymGen = Utils.Generator.SymGen (struct
   let s = "v"

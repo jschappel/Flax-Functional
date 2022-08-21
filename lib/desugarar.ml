@@ -1,5 +1,5 @@
-open Grammar.SourceGrammar
-open Grammar.CoreGrammar
+open Flax_grammar.SourceGrammar
+open Flax_grammar.CoreGrammar
 
 (* A detailed explination of how each of the expression are desugared can be found in:
    `doc/desugar.md` *)

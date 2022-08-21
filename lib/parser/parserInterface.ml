@@ -14,4 +14,4 @@ let parse' f s =
 
 let parse_program s = parse' Parser.program s
 
-let show_program = Grammar.SourceGrammar.show_program
+let show_program = Flax_grammar.SourceGrammar.show_program
