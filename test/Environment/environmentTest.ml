@@ -28,11 +28,25 @@ let alpha_env_apply _ =
   assert_equal (apply "y" alpha_env) (Some(CoreNumExp 3.0));
   assert_equal (apply "z" alpha_env) (Some(CoreNumExp 6.0))
 
+
+  let alpha_env_add _ = 
+    let open AlphaEnvironment in
+    let alpha_env = new_env () 
+    |> ext "x" (CoreNumExp 1.)
+    |> add "y" (CoreNumExp 3.)
+    |> add "z" (CoreNumExp 6.)
+    in
+    assert_equal (apply "x" alpha_env) (Some(CoreNumExp 1.0));
+    assert_equal (apply "j" alpha_env) None;
+    assert_equal (apply "y" alpha_env) (Some(CoreNumExp 3.0));
+    assert_equal (apply "z" alpha_env) (Some(CoreNumExp 6.0))
+
 let suite =
   "Environment tests"
   >::: [
          "Alpha Env ext" >:: alpha_env_contains;
          "Alpha Env Apply" >:: alpha_env_apply;
+         "Alpha Env Add" >:: alpha_env_add;
        ]
 
 let _ = run_test_tt_main suite

@@ -4,6 +4,7 @@ module type ENV = sig
 
   val new_env : unit -> 'a t
   val ext : key -> 'a -> 'a t -> 'a t
+  val add : key -> 'a -> 'a t -> 'a t
   val apply : key -> 'a t -> 'a option
   val contains : key -> 'a t -> bool
 end
@@ -23,6 +24,8 @@ module PrimEnvironment : ENV with type key = string = struct
   ;;
 
   let ext _ _ _ = failwith "Prim Env can not be extended"
+
+  let add _ _ _ = failwith "New values/functions can not be added the the Prim Env"
 
   (** TODO: Update this when I know what the second value should be *)
   let apply _v _e = None
@@ -45,6 +48,10 @@ module AlphaEnvironment : ENV with type key = string = struct
   let get_value target (v, _) = String.equal target v
   let new_env () = Empty
   let ext k v env = ExtEnv ([ k, v ], env)
+
+  let add k v = function
+  | ExtEnv(env, ext_env) -> ExtEnv((k,v) :: env, ext_env)
+  | Empty -> failwith "Can not add to a empty enviroment"
 
   let rec apply target = function
     | Empty -> None

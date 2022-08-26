@@ -10,6 +10,9 @@ module type ENV = sig
   (** [ext p e] extends the environment by adding the given pair *)
   val ext : key -> 'a -> 'a t -> 'a t
 
+  (** [add p e] adds the given pair to the current lexical scope in the environment *)
+  val add : key -> 'a -> 'a t -> 'a t
+
   (** [apply s e] Applies the given input var into environment. *)
   val apply : key -> 'a t -> 'a option
 
