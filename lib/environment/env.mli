@@ -7,6 +7,9 @@ module type ENV = sig
   (** Returns an new environment *)
   val new_env : unit -> 'a t
 
+  (** [new_scope e] extends the environment by adding a new empty scope *)
+  val new_scope : 'a t -> 'a t
+
   (** [ext p e] extends the environment by adding the given pair *)
   val ext : key -> 'a -> 'a t -> 'a t
 

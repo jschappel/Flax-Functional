@@ -16,7 +16,7 @@
 (* helper regexes *)
 let digit = ['0'-'9']
 let alpha = ['a'-'z' 'A'-'Z']
-let sign = ['+' '-' '*' '/']
+let sign = ['+' '-' '*' '/' '=' '$']
 
 (* regex for a number *)
 let frac = '.' digit*

@@ -9,6 +9,7 @@
   desugararTest
   cpsTest
   generatorTest
+  alphaConverterTest
   freevarTransformerTest)
  (action
   (run %{test}))

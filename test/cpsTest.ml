@@ -26,7 +26,7 @@ let assert_prog_eq (actual : string) (expected : string) : unit =
     actual |> Parser.parse_program |> Desugarar.desugar_program |> Cps.cps_program
   in
   let parsed_expected = expected |> Parser.parse_program |> Desugarar.desugar_program in
-  assert_equal ~printer:show_core_prog parsed_actual parsed_expected
+  assert_equal ~printer:show_core_prog parsed_expected parsed_actual
 
 let cps_function_1 _ =
   assert_prog_eq_parse_tree "(define (f x) 3)"
@@ -215,6 +215,12 @@ let cps_function_7 _ =
                  [] ) );
        ])
 
+let cps_function_8 _ = 
+  assert_prog_eq 
+  "(define (fact n) (if (= n 0) 1 (* n (fact (- n 1)))))"
+  "(define fact (lambda (n) (fact/k n end-k))) (define fact/k (lambda (n $k$) (if (= n 0) ($k$ 1) (fact/k (- n 1) (lambda (v0) ($k$ (* n v0)))))))"
+
+  
 let suite =
   "Cps tests"
   >::: [
@@ -224,7 +230,8 @@ let suite =
          "Cps Basic Function 4" >:: cps_function_4;
          "Cps Basic Function 5" >:: cps_function_5;
          "Cps Basic Function 6" >:: cps_function_6;
-         "Cps Basic Function 6" >:: cps_function_7;
+         "Cps Basic Function 7" >:: cps_function_7;
+         "Cps Basic Function 8" >:: cps_function_8;
        ]
 
 let _ = run_test_tt_main suite

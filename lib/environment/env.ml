@@ -3,6 +3,7 @@ module type ENV = sig
   type 'a t
 
   val new_env : unit -> 'a t
+  val new_scope : 'a t -> 'a t
   val ext : key -> 'a -> 'a t -> 'a t
   val add : key -> 'a -> 'a t -> 'a t
   val apply : key -> 'a t -> 'a option
@@ -23,8 +24,8 @@ module PrimEnvironment : ENV with type key = string = struct
     ]
   ;;
 
+  let new_scope _ = failwith "Can not add a new scope to the prim env"
   let ext _ _ _ = failwith "Prim Env can not be extended"
-
   let add _ _ _ = failwith "New values/functions can not be added the the Prim Env"
 
   (** TODO: Update this when I know what the second value should be *)
@@ -47,11 +48,13 @@ module AlphaEnvironment : ENV with type key = string = struct
 
   let get_value target (v, _) = String.equal target v
   let new_env () = Empty
+  let new_scope env = ExtEnv ([], env)
   let ext k v env = ExtEnv ([ k, v ], env)
 
   let add k v = function
-  | ExtEnv(env, ext_env) -> ExtEnv((k,v) :: env, ext_env)
-  | Empty -> failwith "Can not add to a empty enviroment"
+    | ExtEnv (env, ext_env) -> ExtEnv ((k, v) :: env, ext_env)
+    | Empty -> ExtEnv ([ k, v ], Empty)
+  ;;
 
   let rec apply target = function
     | Empty -> None

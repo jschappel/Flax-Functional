@@ -4,6 +4,7 @@ module Desugarar = Desugarar
 module Cps = Cps
 module Grammar = Flax_grammar
 module Environment = Flax_environment.Env
+module AlphaConverter = AlphaConverter
 
 module Build = struct
   let run_prog prog =
