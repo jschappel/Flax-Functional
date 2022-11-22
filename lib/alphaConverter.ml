@@ -59,7 +59,8 @@ let rec alpha_convert_exp env exp =
   | CoreAppExp ((CoreVarExp rator as r), rands)
     when PrimEnvironment.contains rator prim_env ->
       CoreAppExp (r, List.map (alpha_convert_exp env) rands)
-  | CoreAppExp(rator, rands) -> CoreAppExp(alpha_convert_exp env rator, List.map (alpha_convert_exp env) rands)
+  | CoreAppExp (rator, rands) ->
+      CoreAppExp (alpha_convert_exp env rator, List.map (alpha_convert_exp env) rands)
   | CoreSetExp (v, e) -> CoreSetExp (get_alpha_var v, alpha_convert_exp env e)
   | CoreFreeVarExp _ -> failwith "Unreachable"
 

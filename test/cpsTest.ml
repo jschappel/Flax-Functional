@@ -215,13 +215,44 @@ let cps_function_7 _ =
                  [] ) );
        ])
 
-let cps_function_8 _ =
+let cps_function_factorial _ =
   assert_prog_eq "(define (fact n) (if (= n 0) 1 (* n (fact (- n 1)))))"
     "(define fact (lambda (n) (fact/k n end-k)))
      (define fact/k (lambda (n $k$) 
         (if (= n 0)
           ($k$ 1) 
           (fact/k (- n 1) (lambda (v0) ($k$ (* n v0)))))))"
+
+let cps_function_insertion_sort _ =
+  assert_prog_eq
+    "
+  (define (insort L)
+    (if (null? L)
+        L
+        (insert (car L) (insort (cdr L)))))
+
+  (define (insert x L)
+    (if (null? L)
+        (list x)
+        (if (<= x (car L))
+            (cons x L)
+            (cons (car L) (insert x (cdr L))))))"
+    "
+  (define insort (lambda (L) (insort/k L end-k)))
+  (define insort/k
+    (lambda (L $k$)
+      (if (null? L)
+        ($k$ L)
+        (insort/k (cdr L) (lambda (v0) (insert/k (car L) v0 $k$))))))
+
+  (define insert (lambda (x L) (insert/k x L end-k)))
+  (define insert/k
+    (lambda (x L $k$)
+      (if (null? L)
+        ($k$ (cons x (emptylist)))
+        (if (<= x (car L))
+          ($k$ (cons x L))
+          (insert/k x (cdr L) (lambda (v1) ($k$ (cons (car L) v1))))))))"
 
 let suite =
   "Cps tests"
@@ -233,7 +264,8 @@ let suite =
          "Cps Basic Function 5" >:: cps_function_5;
          "Cps Basic Function 6" >:: cps_function_6;
          "Cps Basic Function 7" >:: cps_function_7;
-         "Cps Basic Function 8" >:: cps_function_8;
+         "Cps Basic Function 8" >:: cps_function_factorial;
+         "Cps Basic Function 9" >:: cps_function_insertion_sort;
        ]
 
 let _ = run_test_tt_main suite
