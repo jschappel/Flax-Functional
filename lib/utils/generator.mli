@@ -11,8 +11,9 @@ module SymGen : functor (S : Sym) -> sig
   val reset : unit -> unit
 end
 
-module type SymFmt = sig 
-  val fmt: int -> string
+module type SymFmt = sig
+  (** A function that is used to format the generated symbol *)
+  val fmt : int -> string
 end
 
 module SymGenFmt : functor (S : SymFmt) -> sig

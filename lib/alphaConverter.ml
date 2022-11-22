@@ -2,12 +2,19 @@ open Flax_grammar.CoreGrammar
 open Flax_environment.Env
 open Utils.Generator
 
+(* Unique symbol generator for definitons *)
 module AlphaDefGen = SymGenFmt (struct
   let fmt num = "__D" ^ Int.to_string num ^ "__"
 end)
 
+(* Unique symbol generator for variables *)
 module AlphaVarGen = SymGenFmt (struct
-let fmt num = "__V" ^ Int.to_string num ^ "__"
+  let fmt num = "__V" ^ Int.to_string num ^ "__"
+end)
+
+(* Unique symbol generator for continuation var `$k$` *)
+module AlphaContGen = SymGenFmt (struct
+  let fmt num = "__K" ^ Int.to_string num ^ "__"
 end)
 
 let prim_env = PrimEnvironment.new_env ()
@@ -33,7 +40,14 @@ let rec alpha_convert_exp env exp =
   | CoreBeginExp exps -> List.map (alpha_convert_exp env) exps |> CoreBeginExp
   | CoreNotExp e1 -> alpha_convert_exp env e1 |> CoreNotExp
   | CoreLambdaExp (params, body, fvars) ->
-      let alpha_params = List.map (fun v -> (v, AlphaVarGen.gen_sym ())) params in
+      let alpha_params =
+        List.map
+          (fun v ->
+            match v with
+            | "$k$" -> (v, AlphaContGen.gen_sym ())
+            | _ -> (v, AlphaVarGen.gen_sym ()))
+          params
+      in
       let new_env =
         List.fold_left
           (fun env (v, a) -> AlphaEnvironment.add v a env)
@@ -45,12 +59,9 @@ let rec alpha_convert_exp env exp =
   | CoreAppExp ((CoreVarExp rator as r), rands)
     when PrimEnvironment.contains rator prim_env ->
       CoreAppExp (r, List.map (alpha_convert_exp env) rands)
-  | CoreAppExp (CoreVarExp rator, rands) ->
-      CoreAppExp
-        (get_alpha_var rator |> CoreVarExp, List.map (alpha_convert_exp env) rands)
+  | CoreAppExp(rator, rands) -> CoreAppExp(alpha_convert_exp env rator, List.map (alpha_convert_exp env) rands)
   | CoreSetExp (v, e) -> CoreSetExp (get_alpha_var v, alpha_convert_exp env e)
   | CoreFreeVarExp _ -> failwith "Unreachable"
-  | _ -> failwith "TODO: Impliment"
 
 let alpha_convert_def global_env (CoreDef (var, exp)) =
   match AlphaEnvironment.apply var global_env with

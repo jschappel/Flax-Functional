@@ -9,7 +9,7 @@ module ContSymGen = SymGen (struct
   let s = "K"
 end)
 
-module FormatterSymGen = SymGenFmt(struct
+module FormatterSymGen = SymGenFmt (struct
   let fmt num = "__" ^ "D" ^ Int.to_string num ^ "__"
 end)
 
@@ -35,16 +35,16 @@ let generate_cont_symbols _ =
   assert_equal (ContSymGen.gen_sym ()) "K1";
   assert_equal (ContSymGen.gen_sym ()) "K2"
 
-  let generate_fmt_symbols _ =
-    assert_equal (FormatterSymGen.gen_sym ()) "__D0__";
-    assert_equal (FormatterSymGen.gen_sym ()) "__D1__";
-    assert_equal (FormatterSymGen.gen_sym ()) "__D2__";
-  
-    FormatterSymGen.reset ();
-  
-    assert_equal (FormatterSymGen.gen_sym ()) "__D0__";
-    assert_equal (FormatterSymGen.gen_sym ()) "__D1__";
-    assert_equal (FormatterSymGen.gen_sym ()) "__D2__"
+let generate_fmt_symbols _ =
+  assert_equal (FormatterSymGen.gen_sym ()) "__D0__";
+  assert_equal (FormatterSymGen.gen_sym ()) "__D1__";
+  assert_equal (FormatterSymGen.gen_sym ()) "__D2__";
+
+  FormatterSymGen.reset ();
+
+  assert_equal (FormatterSymGen.gen_sym ()) "__D0__";
+  assert_equal (FormatterSymGen.gen_sym ()) "__D1__";
+  assert_equal (FormatterSymGen.gen_sym ()) "__D2__"
 
 let suite =
   "Generator tests"
