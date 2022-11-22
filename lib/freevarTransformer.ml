@@ -1,5 +1,4 @@
 open Flax_grammar.CoreGrammar
-open Utils
 
 let freevar_transform_exp _bound_vars _exp = failwith "TODO"
 

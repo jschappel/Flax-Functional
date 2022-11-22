@@ -74,7 +74,52 @@ let sub_exp old_e new_e target_e =
   | CoreSetExp (t, _) -> CoreSetExp (t, new_e)
   | CoreFreeVarExp _ -> failwith "Unreachable"
 
-let rec cps_program (CoreProg defs) =
+(* Update all the call functions to use the new cps function name `<fname>/k` *)
+let rec subst_new_fnames_prog (CoreProg defs) =
+  let env = make_env defs in
+  List.map (subst_new_fnames_def env) defs |> CoreProg
+
+(* Makes a list of all function definitions. *)
+and make_env defs =
+  match defs with
+  | [] -> []
+  | CoreDef (n1, CoreLambdaExp (_, _, _)) :: CoreDef (n2, _) :: xs ->
+      [ (n1, n2) ] :: make_env xs
+  | _ :: xs -> make_env xs
+
+and apply_senv env var =
+  match env with
+  | [] -> None
+  | [ (x, y) ] :: _ when String.equal var x -> Some y
+  | _ :: xs -> apply_senv xs var
+
+and subst_new_fnames_def env (CoreDef (n, e)) = CoreDef (n, subst_new_fnames_exp env e)
+
+and subst_new_fnames_exp env exp =
+  match exp with
+  | CoreNumExp _ | CoreBoolExp _ | CoreStrExp _ | CoreSymExp _ -> exp
+  | CoreVarExp v -> ( match apply_senv env v with Some n -> CoreVarExp n | None -> exp)
+  | CoreIfExp (e1, e2, e3) ->
+      CoreIfExp
+        ( subst_new_fnames_exp env e1,
+          subst_new_fnames_exp env e2,
+          subst_new_fnames_exp env e3 )
+  | CoreLambdaExp (p, b, f) -> CoreLambdaExp (p, subst_new_fnames_exp env b, f)
+  | CoreOrExp exps -> List.map (subst_new_fnames_exp env) exps |> CoreOrExp
+  | CoreAndExp exps -> List.map (subst_new_fnames_exp env) exps |> CoreAndExp
+  | CoreNotExp e -> subst_new_fnames_exp env e |> CoreNotExp
+  | CoreAppExp (rator, rands) ->
+      CoreAppExp
+        (subst_new_fnames_exp env rator, List.map (subst_new_fnames_exp env) rands)
+  | CoreVectorExp exps -> List.map (subst_new_fnames_exp env) exps |> CoreVectorExp
+  | CoreListExp exps -> List.map (subst_new_fnames_exp env) exps |> CoreListExp
+  | CoreBeginExp exps -> List.map (subst_new_fnames_exp env) exps |> CoreBeginExp
+  | CoreSetExp (t, e) -> CoreSetExp (t, subst_new_fnames_exp env e)
+  | CoreFreeVarExp (_, _) -> failwith "Unreachable"
+
+let rec cps_program core_prog = cps_program_helper core_prog |> subst_new_fnames_prog
+
+and cps_program_helper (CoreProg defs) =
   let decide_cps d : core_def list =
     match d with
     | CoreDef (n, (CoreLambdaExp (_, _, _) as l)) -> cps_def_exp n l

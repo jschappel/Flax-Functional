@@ -29,4 +29,4 @@ let suite =
          "Alpha Converte Function 2" >:: alpha_convert_function_2;
        ]
 
-let _ = run_test_tt_main suite
+(* let _ = run_test_tt_main suite *)

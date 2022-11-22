@@ -55,6 +55,7 @@ rule read_token =
   | '"'         { read_string (Buffer.create 17) lexbuf }
   | "'"         { read_symbol (Buffer.create 17) lexbuf }
   | white       { read_token lexbuf }
+  | newline     { read_token lexbuf }
   | number      { NUMBER (float_of_string (Lexing.lexeme lexbuf)) }
   | identifier  { ID (Lexing.lexeme lexbuf) }
   | eof         { EOF }

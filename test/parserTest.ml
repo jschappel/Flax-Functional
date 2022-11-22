@@ -70,8 +70,7 @@ let parse_letrec_exprs _ =
        ( [ ("add", [ "x" ], NumExp 10.0); ("sub", [ "x"; "y" ], NumExp 20.0) ],
          AppExp (VarExp "+", [ VarExp "y"; VarExp "x" ]) ));
   exp_eq
-    "(define x (letrec ((define (add x) 10) (define (sub x y) 20)) (letrec ((define \
-     (mult) 30)) (+ x y z))))"
+    "(define x (letrec ((define (add x) 10) (define (sub x y) 20)) (letrec ((define (mult) 30)) (+ x y z))))"
     (LetRecExp
        ( [ ("add", [ "x" ], NumExp 10.0); ("sub", [ "x"; "y" ], NumExp 20.0) ],
          LetRecExp

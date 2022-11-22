@@ -116,8 +116,7 @@ let desugar_vector_exps _ =
 
 let desugar_letrec_exps _ =
   core_exp_eq
-    "(define x (letrec ((define (is-even? n) true)   (define (is-odd? n) false)) \
-     (is-odd? 11)))"
+    "(define x (letrec ((define (is-even? n) true)   (define (is-odd? n) false)) (is-odd? 11)))"
     (CoreAppExp
        ( CoreLambdaExp
            ( [ "is-even?"; "is-odd?" ],
@@ -130,8 +129,7 @@ let desugar_letrec_exps _ =
              [] ),
          [ Flax_core.Constants.dummy_var; Flax_core.Constants.dummy_var ] ));
   core_exp_eq
-    "(define x (letrec ((define (is-even? n z) true)   (define (is-odd? n z y) false)) \
-     (is-odd? 11 12 13)))"
+    "(define x (letrec ((define (is-even? n z) true)   (define (is-odd? n z y) false)) (is-odd? 11 12 13)))"
     (CoreAppExp
        ( CoreLambdaExp
            ( [ "is-even?"; "is-odd?" ],

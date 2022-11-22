@@ -1,5 +1,5 @@
 open OUnit2
-open Flax_core.FreevarTransformer
+(* open Flax_core.FreevarTransformer *)
 
 (* let occurs_free_in_exp var target_exp = let open Flax_core.Lib in let def_exp =
    "(define test " ^ target_exp ^ ")" in let prog = in assert_equal *)

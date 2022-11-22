@@ -8,3 +8,4 @@ wrap-comments = true
 break-infix=fit-or-vertical
 type-decl=sparse
 module-item-spacing=sparse
+break-string-literals=never

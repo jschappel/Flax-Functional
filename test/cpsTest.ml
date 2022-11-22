@@ -215,12 +215,14 @@ let cps_function_7 _ =
                  [] ) );
        ])
 
-let cps_function_8 _ = 
-  assert_prog_eq 
-  "(define (fact n) (if (= n 0) 1 (* n (fact (- n 1)))))"
-  "(define fact (lambda (n) (fact/k n end-k))) (define fact/k (lambda (n $k$) (if (= n 0) ($k$ 1) (fact/k (- n 1) (lambda (v0) ($k$ (* n v0)))))))"
+let cps_function_8 _ =
+  assert_prog_eq "(define (fact n) (if (= n 0) 1 (* n (fact (- n 1)))))"
+    "(define fact (lambda (n) (fact/k n end-k)))
+     (define fact/k (lambda (n $k$) 
+        (if (= n 0)
+          ($k$ 1) 
+          (fact/k (- n 1) (lambda (v0) ($k$ (* n v0)))))))"
 
-  
 let suite =
   "Cps tests"
   >::: [
