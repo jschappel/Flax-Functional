@@ -2,12 +2,12 @@ open Flax_grammar.CoreGrammar
 open Flax_environment.Env
 open Utils.Generator
 
-module AlphaDefGen = SymGen (struct
-  let s = "*D*"
+module AlphaDefGen = SymGenFmt (struct
+  let fmt num = "__D" ^ Int.to_string num ^ "__"
 end)
 
-module AlphaVarGen = SymGen (struct
-  let s = "*V*"
+module AlphaVarGen = SymGenFmt (struct
+let fmt num = "__V" ^ Int.to_string num ^ "__"
 end)
 
 let prim_env = PrimEnvironment.new_env ()

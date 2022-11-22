@@ -15,7 +15,7 @@
 
 (* helper regexes *)
 let digit = ['0'-'9']
-let alpha = ['a'-'z' 'A'-'Z']
+let alpha = ['a'-'z' 'A'-'Z' '_']
 let sign = ['+' '-' '*' '/' '=' '$']
 
 (* regex for a number *)
