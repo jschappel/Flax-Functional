@@ -1,12 +1,26 @@
 open Flax_grammar.CoreGrammar
+open Flax_environment.Env
 
-let freevar_transform_exp _bound_vars _exp = failwith "TODO"
+module FreeVarEnvironment = AlphaEnvironment
 
-let freevar_transform_def (CoreDef (id, exp)) =
-  CoreDef (id, freevar_transform_exp [ id ] exp)
+let rec freevar_transform_exp bound_vars exp = match exp with
+| CoreNumExp _  -> exp
+| CoreBoolExp _ -> exp 
+| CoreSymExp _ -> exp
+| CoreStrExp _ -> exp
+| CoreVarExp _ -> exp (*TODO: Double check this case *)
+| CoreIfExp(e1,e2,e3) -> CoreIfExp(freevar_transform_exp bound_vars e1, freevar_transform_exp bound_vars e2, freevar_transform_exp bound_vars e3)
+(* | CoreLambdaExp(p, b, f) -> 
+  let new_bound_vars = p @ bound_vars in
+  CoreLambdaExp *)
+| _ -> failwith "TODO"
+
+let freevar_transform_def bound_vars (CoreDef (id, exp)) =
+  CoreDef (id, freevar_transform_exp bound_vars exp)
 
 let freevar_transfom_program (CoreProg defs) =
-  defs |> List.map freevar_transform_def |> CoreProg
+  let bound_vars = List.map (fun (CoreDef(n, _)) -> n) defs in
+  defs |> List.map (freevar_transform_def bound_vars) |> CoreProg
 
 let rec occurs_free var exp =
   let open Utils in
