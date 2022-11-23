@@ -70,10 +70,17 @@ let alpha_convert_def global_env (CoreDef (var, exp)) =
   | None -> failwith @@ "No alphaname generated for definition name: " ^ var
 
 let alpha_convert_program (CoreProg defs) =
+  let reset_generators =
+    AlphaDefGen.reset ();
+    AlphaVarGen.reset ();
+    AlphaContGen.reset ()
+  in
   let global_env =
     List.fold_left
       (fun env (CoreDef (var, _)) ->
         AlphaEnvironment.add var (AlphaDefGen.gen_sym ()) env)
       (AlphaEnvironment.new_env ()) defs
   in
-  List.map (alpha_convert_def global_env) defs |> CoreProg
+  let alpha_prog = List.map (alpha_convert_def global_env) defs |> CoreProg in
+  reset_generators;
+  alpha_prog
