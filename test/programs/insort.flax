@@ -1,0 +1,11 @@
+(define (insort L)
+    (if (null? L)
+        L
+        (insert (car L) (insort (cdr L)))))
+
+(define (insert x L)
+  (if (null? L)
+      (list x)
+      (if (<= x (car L))
+          (cons x L)
+          (cons (car L) (insert x (cdr L))))))
