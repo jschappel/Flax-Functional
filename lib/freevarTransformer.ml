@@ -65,12 +65,16 @@ let freevar_transfom_program (CoreProg defs : core_prog) =
           let f_rands, computed_fvars_rands = transform_list rands in
           (CoreAppExp (f_rator, f_rands), computed_fvars_rator @ computed_fvars_rands)
       | CoreLambdaExp (params, body, fvars) ->
-          let new_bound_vars = bound_vars @ params in
-          let transformed_body, computed_fvars = helper new_bound_vars fvars body in
-          ( CoreLambdaExp (params, transformed_body, computed_fvars),
-            List.filter (fun v -> List.mem v params) fvars )
+          let transformed_body, inner_fvars = helper params fvars body in
+          let computed_fvars =
+            inner_fvars
+            |> List.filter (fun v -> not @@ List.mem v params)
+            |> List.sort_uniq String.compare
+          in
+          (CoreLambdaExp (params, transformed_body, computed_fvars), computed_fvars)
     in
     let transformed_exp, fvars = helper bound_vars [] exp in
+    Printf.printf "%s" @@ show_core_exp transformed_exp;
     if fvars = [] then transformed_exp
     else
       failwith

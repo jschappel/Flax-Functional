@@ -30,16 +30,16 @@ let find_all_free_vars (prog : string) : string list =
       single_def
       |> Parser.parse_program
       |> Desugarar.desugar_program
-      |> Cps.cps_program
+      (* |> Cps.cps_program *)
       |> FreevarTransformer.freevar_transfom_program
     in
     List.map (fun (CoreDef (_, exp)) -> find_all_free exp) defs
     |> List.flatten
-    |> List.sort String.compare
+    |> List.sort_uniq String.compare
   in
   transform_single_prog prog
 
-let occurs_free_basics _ =
+let fvar_transform_basics _ =
   assert_equal ~printer:[%derive.show: string list] []
     (find_all_free_vars "(define x 10)");
   assert_equal ~printer:[%derive.show: string list] []
@@ -54,7 +54,58 @@ let occurs_free_basics _ =
     (find_all_free_vars
        "(define x 10) (define dummy (if (equal? x 0) 1 (lambda (y z) (+ y z zz))))")
 
+let fvar_transform_nested _ =
+  assert_equal ~printer:[%derive.show: string list] [ "a"; "b" ]
+    (find_all_free_vars
+       "(define test
+          (lambda (a b)
+            (lambda (c d) 
+              (+ a b c d))))
+        ");
+
+  assert_equal ~printer:[%derive.show: string list] [ "a"; "b"; "c"; "d" ]
+    (find_all_free_vars
+       "(define test
+          (lambda (a b)
+            (lambda (c d)
+              (lambda (e f)
+              (+ a b c d e f)))))
+        ");
+  assert_equal ~printer:[%derive.show: string list] [ "a"; "b"; "c"; "d" ]
+    (find_all_free_vars
+       "(define AA 10)
+        (define test
+          (lambda (a b)
+            (lambda (c d)
+              (lambda (e f)
+                (+ a b c d e f AA)))))
+        ")
+
+  
+let fvar_transform_shadowing _ =
+  assert_equal ~printer:[%derive.show: string list] ["b"]
+    (find_all_free_vars
+      "(define test
+          (lambda (a b)
+            (lambda (a d)
+              (+ a b d))))
+        ");
+  assert_equal ~printer:[%derive.show: string list] [ "a"; "b" ;"c"; "d"]
+    (find_all_free_vars
+      "(define test
+          (lambda (a b)
+            (lambda (c d)
+              (begin 
+                (+ a b c d)
+                (lambda (a) (+ a b c d))))))
+        ")
+
 let suite =
-  "Freevar Transformer tests" >::: [ "Occurs Free in basic exp" >:: occurs_free_basics ]
+  "Freevar Transformer tests"
+  >::: [
+         (* "Freevar Transform Basic expressions" >:: fvar_transform_basics ;
+         "Freevar Transform Nested Lambdas" >:: fvar_transform_nested; *)
+         "Freevar Transform Shadowed Lambdas" >:: fvar_transform_shadowing;
+       ]
 
 let _ = run_test_tt_main suite
