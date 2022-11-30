@@ -1,4 +1,4 @@
-open Stdio
+open Stdlib
 open Flax_core.Lib
 
 (* let token_list_to_string l = [%show: token list] l *)
@@ -17,17 +17,16 @@ let () =
   (* We have a file if this is true *)
   if Array.length args > 1 then
     match args with
-    | [| _; _filename |] -> Out_channel.print_endline "TODO" (* @@ run_file filename *)
+    | [| _; _filename |] -> Stdlib.print_endline "TODO" (* @@ run_file filename *)
     | _ -> failwith "Expected form: filename.flax"
   else
     while true do
-      Out_channel.printf "> ";
-      Out_channel.flush stdout;
-      match In_channel.input_line stdin with
-      | Some "exit" -> exit 0
-      | Some line ->
+      Stdlib.print_string "> ";
+      Stdlib.flush stdout;
+      match Stdlib.input_line stdin with
+      | "exit" -> exit 0
+      | line ->
           Build.run_prog line
           |> Build.show_core_prog
-          |> Out_channel.print_endline (* @@ run_env line *)
-      | None -> Out_channel.print_endline "NULL"
+          |> Stdlib.print_endline (* @@ run_env line *)
     done

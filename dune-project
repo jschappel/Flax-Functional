@@ -14,7 +14,7 @@
  (synopsis "Core functionality for the compiler")
  (depends
   (ounit2 :with-test)
-  core
+  base
   menhir
   ppx_deriving))
 

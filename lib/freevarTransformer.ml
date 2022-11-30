@@ -14,7 +14,7 @@ let freevar_transfom_program (CoreProg defs : core_prog) =
     let is_prim v = PrimEnvironment.contains v prim_env in
 
     (* converts a list of core_exps to a tuple containing the computed fvar expresssions
-       and a list contained the computed fvars for all the fvar expressions *)
+       and a list containing the fvar names in the computed fvar expresssion *)
     let rec helper bound_vars fvars exp : core_exp * string list =
       let transform_list exps =
         let results = List.map (helper bound_vars fvars) exps in
@@ -92,8 +92,7 @@ let rec occurs_free var exp =
   | CoreOrExp exps -> ListUtils.ormap (occurs_free var) exps
   | CoreAndExp exps -> ListUtils.ormap (occurs_free var) exps
   | CoreNotExp e -> occurs_free var e
-  | CoreAppExp (r, rands) ->
-      [ r ] |> List.append rands |> ListUtils.ormap (occurs_free var)
+  | CoreAppExp (r, rands) -> ListUtils.ormap (occurs_free var) (rands @ [ r ])
   | CoreVectorExp exps -> ListUtils.ormap (occurs_free var) exps
   | CoreListExp exps -> ListUtils.ormap (occurs_free var) exps
   | CoreSetExp (_, e) -> occurs_free var e

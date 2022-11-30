@@ -1,8 +1,8 @@
 (library
  (name flax_core)
- (libraries core flax_parser flax_environment flax_grammar utils)
+ (libraries base flax_parser flax_environment flax_grammar utils)
  (preprocess
-  (pps ppx_jane ppx_deriving.show ppx_deriving.eq)))
+  (pps ppx_pipebang ppx_deriving.show ppx_deriving.eq)))
 
 (env
  (dev

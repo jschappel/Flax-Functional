@@ -1,8 +1,8 @@
 (library
  (name flax_environment)
- (libraries core utils)
+ (libraries base utils)
  (preprocess
-  (pps ppx_jane ppx_deriving.show ppx_deriving.eq)))
+  (pps ppx_deriving.show ppx_deriving.eq)))
 
 (env
  (dev

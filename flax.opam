@@ -8,7 +8,7 @@ bug-reports: "https://github.com/jschappel/Flax-Functional/issues"
 depends: [
   "dune" {>= "2.8"}
   "ounit2" {with-test}
-  "core"
+  "base"
   "menhir"
   "ppx_deriving"
   "odoc" {with-doc}

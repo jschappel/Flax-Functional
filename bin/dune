@@ -1,8 +1,8 @@
 (executables
  (names program)
- (libraries flax_core)
+ (libraries base flax_core)
  (preprocess
-  (pps ppx_jane ppx_deriving.show)))
+  (pps ppx_deriving.show)))
 
 (env
  (dev

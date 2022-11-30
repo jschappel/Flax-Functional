@@ -1,6 +1,6 @@
 (library
  (name flax_parser)
- (libraries core flax_grammar)
+ (libraries flax_grammar)
  (preprocess
   (pps ppx_deriving.show)))
 
