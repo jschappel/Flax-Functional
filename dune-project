@@ -16,5 +16,6 @@
   (ounit2 :with-test)
   base
   menhir
+  ppx_jane
   ppx_deriving))
 
