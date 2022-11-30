@@ -73,14 +73,8 @@ let freevar_transfom_program (CoreProg defs : core_prog) =
           in
           (CoreLambdaExp (params, transformed_body, computed_fvars), computed_fvars)
     in
-    let transformed_exp, fvars = helper bound_vars [] exp in
-    Printf.printf "%s" @@ show_core_exp transformed_exp;
-    if fvars = [] then transformed_exp
-    else
-      failwith
-      @@ Printf.sprintf
-           "Internal Freevar Transformer Compiler Error. Expected empty but was given: %s"
-      @@ [%show: string list] fvars
+    let transformed_exp, _ = helper bound_vars [] exp in
+    transformed_exp
   in
 
   defs |> List.map freevar_transform_def |> CoreProg

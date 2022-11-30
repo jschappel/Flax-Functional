@@ -30,7 +30,7 @@ let find_all_free_vars (prog : string) : string list =
       single_def
       |> Parser.parse_program
       |> Desugarar.desugar_program
-      (* |> Cps.cps_program *)
+      |> Cps.cps_program
       |> FreevarTransformer.freevar_transfom_program
     in
     List.map (fun (CoreDef (_, exp)) -> find_all_free exp) defs
@@ -81,18 +81,17 @@ let fvar_transform_nested _ =
                 (+ a b c d e f AA)))))
         ")
 
-  
 let fvar_transform_shadowing _ =
-  assert_equal ~printer:[%derive.show: string list] ["b"]
+  assert_equal ~printer:[%derive.show: string list] [ "b" ]
     (find_all_free_vars
-      "(define test
+       "(define test
           (lambda (a b)
             (lambda (a d)
               (+ a b d))))
         ");
-  assert_equal ~printer:[%derive.show: string list] [ "a"; "b" ;"c"; "d"]
+  assert_equal ~printer:[%derive.show: string list] [ "a"; "b"; "c"; "d" ]
     (find_all_free_vars
-      "(define test
+       "(define test
           (lambda (a b)
             (lambda (c d)
               (begin 
@@ -103,8 +102,8 @@ let fvar_transform_shadowing _ =
 let suite =
   "Freevar Transformer tests"
   >::: [
-         (* "Freevar Transform Basic expressions" >:: fvar_transform_basics ;
-         "Freevar Transform Nested Lambdas" >:: fvar_transform_nested; *)
+         "Freevar Transform Basic expressions" >:: fvar_transform_basics;
+         "Freevar Transform Nested Lambdas" >:: fvar_transform_nested;
          "Freevar Transform Shadowed Lambdas" >:: fvar_transform_shadowing;
        ]
 
