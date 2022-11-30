@@ -30,7 +30,7 @@ let find_all_free_vars (prog : string) : string list =
       single_def
       |> Parser.parse_program
       |> Desugarar.desugar_program
-      (* |> Cps.cps_program *)
+      |> Cps.cps_program
       |> FreevarTransformer.freevar_transfom_program
     in
     List.map (fun (CoreDef (_, exp)) -> find_all_free exp) defs
