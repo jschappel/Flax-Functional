@@ -14,7 +14,9 @@
  (action
   (run %{test}))
  ;-ci=true))
- (libraries ounit2 flax_core))
+ (libraries ounit2 flax_core)
+ (preprocess
+  (pps ppx_deriving.show)))
 
 (env
  (dev
