@@ -30,7 +30,7 @@ Lexer -> Parser -> Desugarer -> CPS Transformer -> Alpha Conversion -> FreeVar T
 - The `Core Grammar` is the final AST representation if the program. This is then passed though transformation steps to further optimize the program. This includes the `CPS` transformation.
 - `CPS Transformer` converts the program to continuation passing style in order to make every function in tail call position
 - `Alpha Conversion` Computes unique variable names for all variables in the program
-- The `FreeVar transformer` computes all the free variables in the program. This is need for Lambda Lifting
+- The `FreeVar Transformer` computes all the free variables in the program. This is need for Lambda Lifting
 - The `Lambda Lifter` restructures the program so that functions are defined independently of each other in a global scope
 - The final step is to convert the program into machine code, which is done in `CodeGen`.
 
