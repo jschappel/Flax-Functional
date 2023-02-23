@@ -1,19 +1,24 @@
 # Flax Functional
 A small functional language compiler.
 
+## How to install
+```shell
+opam update
+opam install . --deps-only
+```
+install with tests:
+```shell
+opam update
+opam install . --deps-only --with-test
+```
+
 ## How to build
 With Dune: 
 ```shell
 dune build
 ```
 
-With Opam:
-```shell
-opam update
-opam install . --deps-only
-```
-
-#### Run test suite
+## Run test suite
 ```shell
 dune build
 dune runtest
