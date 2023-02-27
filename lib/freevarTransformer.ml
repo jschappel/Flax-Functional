@@ -72,7 +72,10 @@ let freevar_transfom_program (CoreProg defs : core_prog) =
             |> List.sort_uniq String.compare
           in
           (CoreLambdaExp (params, transformed_body, computed_fvars), computed_fvars)
+      | CorePhase2ClosureExp _ | CorePhase2RefExp _ ->
+          failwith "Unreachable. This is introduced during Phase2."
     in
+
     let transformed_exp, _ = helper bound_vars [] exp in
     transformed_exp
   in
@@ -96,3 +99,5 @@ let rec occurs_free var exp =
   | CoreSetExp (_, e) -> occurs_free var e
   | CoreBeginExp exps -> ListUtils.ormap (occurs_free var) exps
   | CoreFreeVarExp _ -> failwith "Unreachable"
+  | CorePhase2ClosureExp _ | CorePhase2RefExp _ ->
+      failwith "Unreachable. This is introduced during Phase2."

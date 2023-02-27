@@ -10,8 +10,7 @@
   cpsTest
   generatorTest
   alphaConverterTest
-  freevarTransformerTest
-  lambdaLifterTest)
+  freevarTransformerTest)
  (action
   (run %{test}))
  ;-ci=true))

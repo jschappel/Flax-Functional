@@ -24,7 +24,10 @@ let rec get_fist_non_tailcall e =
   | CoreListExp exps -> get_fist_non_tailcall_in_list exps
   | CoreSetExp (_, e) -> get_fist_non_tailcall e
   | CoreBeginExp e -> get_fist_non_tailcall_in_list e
-  | CoreFreeVarExp _ -> failwith "Unreachable"
+  | CoreFreeVarExp _ ->
+      failwith "Unreachable. This is introduced during FreeVar transformation"
+  | CorePhase2ClosureExp _ | CorePhase2RefExp _ ->
+      failwith "Unreachable. This is introduced during Phase2."
 
 and get_fist_non_tailcall_in_list = function
   | [] -> None
@@ -50,7 +53,10 @@ let rec occurs_free var exp =
   | CoreListExp exps -> ListUtils.ormap (occurs_free var) exps
   | CoreSetExp (_, e) -> occurs_free var e
   | CoreBeginExp exps -> ListUtils.ormap (occurs_free var) exps
-  | CoreFreeVarExp _ -> failwith "Unreachable"
+  | CoreFreeVarExp _ ->
+      failwith "Unreachable. This is introduced during FreeVar transformation"
+  | CorePhase2ClosureExp _ | CorePhase2RefExp _ ->
+      failwith "Unreachable. This is introduced during Phase2."
 
 (* replaces the old expression with the new expression inside the target *)
 let sub_exp old_e new_e target_e =
@@ -72,7 +78,10 @@ let sub_exp old_e new_e target_e =
   | CoreListExp exps -> List.map sub_in_list exps |> CoreVectorExp
   | CoreBeginExp exps -> List.map sub_in_list exps |> CoreBeginExp
   | CoreSetExp (t, _) -> CoreSetExp (t, new_e)
-  | CoreFreeVarExp _ -> failwith "Unreachable"
+  | CoreFreeVarExp _ ->
+      failwith "Unreachable. This is introduced during FreeVar transformation"
+  | CorePhase2ClosureExp _ | CorePhase2RefExp _ ->
+      failwith "Unreachable. This is introduced during Phase2."
 
 (* Update all the call functions to use the new cps function name `<fname>/k` *)
 let rec subst_new_fnames_prog (CoreProg defs) =
@@ -115,7 +124,10 @@ and subst_new_fnames_exp env exp =
   | CoreListExp exps -> List.map (subst_new_fnames_exp env) exps |> CoreListExp
   | CoreBeginExp exps -> List.map (subst_new_fnames_exp env) exps |> CoreBeginExp
   | CoreSetExp (t, e) -> CoreSetExp (t, subst_new_fnames_exp env e)
-  | CoreFreeVarExp (_, _) -> failwith "Unreachable"
+  | CoreFreeVarExp _ ->
+      failwith "Unreachable. This is introduced during FreeVar transformation"
+  | CorePhase2ClosureExp _ | CorePhase2RefExp _ ->
+      failwith "Unreachable. This is introduced during Phase2."
 
 let rec cps_program core_prog = cps_program_helper core_prog |> subst_new_fnames_prog
 
@@ -243,7 +255,10 @@ and cps_exp exp k =
               let cps_before = cps_exp fnt (CoreLambdaExp ([ k_param ], cps_after, [])) in
               CoreBeginExp (List.append before [ cps_before ])
           | _ -> failwith "Unreachable"))
-  | CoreFreeVarExp (_, _) -> failwith "Unreachable"
+  | CoreFreeVarExp _ ->
+      failwith "Unreachable. This is introduced during FreeVar transformation"
+  | CorePhase2ClosureExp _ | CorePhase2RefExp _ ->
+      failwith "Unreachable. This is introduced during Phase2."
 
 and mk_cps_exp target_exp k =
   match get_fist_non_tailcall target_exp with

@@ -40,6 +40,8 @@ let find_all_free_vars (prog : string) : Fvar.t list =
     | CoreLambdaExp (_, b, fvars) ->
         let body_fvars = find_all_free (depth + 1) b in
         body_fvars @ List.map (fun f -> (f, depth)) fvars
+    | CorePhase2ClosureExp _ | CorePhase2RefExp _ ->
+        failwith "Unreachable. This is introduced during Phase2."
   in
   let transform_single_prog single_def =
     let open Flax_core.Lib in
