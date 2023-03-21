@@ -3,75 +3,95 @@ open Flax_environment.Env
 
 type core_phase2_prog = core_prog
 
-
 let prim_env = PrimEnvironment.new_env ()
 
 module EnvNameSymGen = Utils.Generator.SymGen (struct
   let s = "env$"
 end)
 
-let rec occurs_free var exp =
-  let open Utils in
-  match exp with
-  | CoreNumExp _ | CoreBoolExp _ | CoreSymExp _ | CoreStrExp _ -> false
-  | CoreVarExp v -> String.equal v var
-  | CoreIfExp (e1, e2, e3) ->
-      occurs_free var e1 || occurs_free var e2 || occurs_free var e3
-  | CoreLambdaExp (p, b, _) -> (not @@ List.mem var p) && occurs_free var b
-  | CoreOrExp exps -> ListUtils.ormap (occurs_free var) exps
-  | CoreAndExp exps -> ListUtils.ormap (occurs_free var) exps
-  | CoreNotExp e -> occurs_free var e
-  | CoreAppExp (r, rands) -> ListUtils.ormap (occurs_free var) (rands @ [ r ])
-  | CoreVectorExp exps -> ListUtils.ormap (occurs_free var) exps
-  | CoreListExp exps -> ListUtils.ormap (occurs_free var) exps
-  | CoreSetExp (_, e) -> occurs_free var e
-  | CoreBeginExp exps -> ListUtils.ormap (occurs_free var) exps
-  | CorePhase2RefExp {id; _} -> String.equal id var
-  | CorePhase2ClosureExp { body; env; _} -> 
-    let env_vars = List.map (fun (x, _) -> x) env in
-    (not @@ List.mem var env_vars) && occurs_free var body
-  | CoreFreeVarExp _ -> failwith "Unreachable"
+(* https://matt.might.net/articles/closure-conversion/
 
-let rec substitute_fvars env_ref fvars body =
-  let substitute_fvars_in_list exps = List.map (substitute_fvars env_ref fvars) exps in
+   lambda (f): lambda (z): -- generate ref to f lambda (x): -- generate ref to f z (+ f z
+   x) *)
+
+module FreeVarMap = Map.Make (String)
+module FreeVarSet = Set.Make (String)
+
+(* Finds all free variables in the given expresssion *)
+let compute_free_vars exp =
+  let rec find_free_vars exp =
+    let find_free_vars_lst lst =
+      lst |> List.map find_free_vars |> List.fold_left FreeVarSet.union FreeVarSet.empty
+    in
+    let is_prim v = PrimEnvironment.contains v prim_env in
+    match exp with
+    | CoreNumExp _ | CoreBoolExp _ | CoreSymExp _ | CoreStrExp _ | CorePhase2RefExp _ ->
+        FreeVarSet.empty
+    | CoreVarExp v ->
+        if not @@ is_prim v then FreeVarSet.of_list [ v ] else FreeVarSet.empty
+    | CoreIfExp (e1, e2, e3) ->
+        find_free_vars e1
+        |> FreeVarSet.union @@ find_free_vars e2
+        |> FreeVarSet.union @@ find_free_vars e3
+    | CoreLambdaExp (p, b, _) -> FreeVarSet.diff (find_free_vars b) (FreeVarSet.of_list p)
+    | CoreOrExp exps -> find_free_vars_lst exps
+    | CoreAndExp exps -> find_free_vars_lst exps
+    | CoreNotExp e -> find_free_vars e
+    | CoreAppExp (r, rands) ->
+        FreeVarSet.union (find_free_vars r) (find_free_vars_lst rands)
+    | CoreVectorExp exps -> find_free_vars_lst exps
+    | CoreListExp exps -> find_free_vars_lst exps
+    | CoreSetExp (_, e) -> find_free_vars e
+    | CoreBeginExp exps -> find_free_vars_lst exps
+    | CorePhase2ClosureExp e ->
+        FreeVarSet.diff (find_free_vars e.body) (FreeVarSet.of_list e.params)
+    | CoreFreeVarExp _ -> failwith "Unreachable"
+  in
+  find_free_vars exp |> FreeVarSet.to_seq |> List.of_seq
+
+(* Substitutes all free variables into the expression *)
+let rec substitute_fvars fvars body =
+  let substitute_fvars_in_list exps = List.map (substitute_fvars fvars) exps in
   match body with
-| CoreNumExp n -> CoreNumExp n
-| CoreSymExp s -> CoreSymExp s
-| CoreStrExp s -> CoreStrExp s
-| CorePhase2RefExp s -> CorePhase2RefExp s
-| CoreVarExp id when List.mem id fvars-> CorePhase2RefExp {env_ref; id }
-| CoreVarExp v -> CoreVarExp v
-| CoreBoolExp b -> CoreBoolExp b
-| CoreAndExp exps -> CoreAndExp (substitute_fvars_in_list exps)
-| CoreOrExp exps -> CoreOrExp (substitute_fvars_in_list exps)
-| CoreBeginExp exps -> CoreBeginExp (substitute_fvars_in_list exps)
-| CoreVectorExp exps -> CoreVectorExp (substitute_fvars_in_list exps)
-| CoreListExp exps -> CoreListExp (substitute_fvars_in_list exps)
-| CoreNotExp e -> CoreNotExp (substitute_fvars env_ref fvars e)
-| CoreIfExp (e1, e2, e3) ->
-  CoreIfExp (substitute_fvars env_ref fvars e1, substitute_fvars env_ref fvars e2, substitute_fvars env_ref fvars e3)
-| CoreSetExp (i, e) -> CoreSetExp (i, substitute_fvars env_ref fvars e)
-| CoreAppExp (rator, rands) ->
-  CoreAppExp (substitute_fvars env_ref fvars rator, substitute_fvars_in_list rands)
-| CoreFreeVarExp _ -> failwith "TODO REMOVE THIS"
-| CoreLambdaExp (p, b, fvars) -> failwith "TODO"
+  | CoreNumExp _ -> body
+  | CoreSymExp _ -> body
+  | CoreStrExp _ -> body
+  | CorePhase2RefExp _ -> body
+  | CoreVarExp id -> (
+      match FreeVarMap.find_opt id fvars with Some v -> v | None -> body)
+  | CoreBoolExp b -> CoreBoolExp b
+  | CoreAndExp exps -> CoreAndExp (substitute_fvars_in_list exps)
+  | CoreOrExp exps -> CoreOrExp (substitute_fvars_in_list exps)
+  | CoreBeginExp exps -> CoreBeginExp (substitute_fvars_in_list exps)
+  | CoreVectorExp exps -> CoreVectorExp (substitute_fvars_in_list exps)
+  | CoreListExp exps -> CoreListExp (substitute_fvars_in_list exps)
+  | CoreNotExp e -> CoreNotExp (substitute_fvars fvars e)
+  | CoreIfExp (e1, e2, e3) ->
+      CoreIfExp
+        (substitute_fvars fvars e1, substitute_fvars fvars e2, substitute_fvars fvars e3)
+  | CoreSetExp (i, e) -> CoreSetExp (i, substitute_fvars fvars e)
+  | CoreAppExp (rator, rands) ->
+      CoreAppExp (substitute_fvars fvars rator, substitute_fvars_in_list rands)
+  | CoreFreeVarExp _ -> failwith "TODO REMOVE THIS"
+  | CoreLambdaExp (p, b, _) ->
+      let non_shadowed_fvars = FreeVarMap.filter (fun k _ -> List.mem k p) fvars in
+      CoreLambdaExp (p, substitute_fvars non_shadowed_fvars b, [])
+  (* TODO Handle Variable shadowing*)
+  | CorePhase2ClosureExp e ->
+      CorePhase2ClosureExp { e with body = substitute_fvars fvars body }
 
-let closure_convert_program (CoreProg defs : core_prog): core_phase2_prog =
-  let global_def_names = List.map (fun (CoreDef (n, _)) -> n) defs in
-  let is_prim v = PrimEnvironment.contains v prim_env in
-
-  (* Closure converts a core def *)
+let closure_convert_program (CoreProg defs : core_prog) : core_phase2_prog =
+  let _global_def_names = List.map (fun (CoreDef (n, _)) -> n) defs in
   let rec closure_convert_def (CoreDef (name, exp)) =
     CoreDef (name, closure_convert_exp exp)
-  (* Closure converts a core exp *)
   and closure_convert_exp exp : core_exp =
     let convert_exp_list exps = List.map closure_convert_exp exps in
     match exp with
-    | CoreNumExp n -> CoreNumExp n
-    | CoreSymExp s -> CoreSymExp s
-    | CoreStrExp s -> CoreStrExp s
-    | CoreVarExp v -> CoreVarExp v
-    | CoreBoolExp b -> CoreBoolExp b
+    | CoreNumExp _ -> exp
+    | CoreSymExp _ -> exp
+    | CoreStrExp _ -> exp
+    | CoreVarExp _ -> exp
+    | CoreBoolExp _ -> exp
     | CoreAndExp exps -> CoreAndExp (convert_exp_list exps)
     | CoreOrExp exps -> CoreOrExp (convert_exp_list exps)
     | CoreBeginExp exps -> CoreBeginExp (convert_exp_list exps)
@@ -83,15 +103,23 @@ let closure_convert_program (CoreProg defs : core_prog): core_phase2_prog =
     | CoreSetExp (i, e) -> CoreSetExp (i, closure_convert_exp e)
     | CoreAppExp (rator, rands) ->
         CoreAppExp (closure_convert_exp rator, convert_exp_list rands)
-    | CoreLambdaExp (p, b, fvars) ->
+    | CoreLambdaExp (p, b, _) ->
         let env_ref = EnvNameSymGen.gen_sym () in
-        let fvars = List.filter (fun v -> occurs_free v b) fvars in
-        let transformed_body = substitute_fvars env_ref fvars  b in
+        let fvars = compute_free_vars exp in
+        let fvar_map =
+          fvars
+          |> List.map (fun id -> (id, CorePhase2RefExp { env_ref; id }))
+          |> List.to_seq
+          |> FreeVarMap.of_seq
+        in
+        let env = List.map (fun v -> (v, EnvVar v)) fvars in
+        let transformed_body = substitute_fvars fvar_map b in
         CorePhase2ClosureExp
           {
+            params = p;
             body = CoreLambdaExp (p, transformed_body, []);
             ref_id = env_ref;
-            env = List.map (fun s -> (s, Var s)) fvars;
+            env;
           }
     | CoreFreeVarExp _ -> failwith "TODO REMOVE THIS"
     | CorePhase2RefExp _ -> exp
@@ -100,19 +128,3 @@ let closure_convert_program (CoreProg defs : core_prog): core_phase2_prog =
   let prog = defs |> List.map closure_convert_def |> CoreProg in
   EnvNameSymGen.reset ();
   prog
-
-
-  (*
-
-  https://matt.might.net/articles/closure-conversion/
-  
-  
-  
-  lambda (f):
-    lambda (z):          -- generate ref to f
-      lambda (x):        -- generate ref to f z
-        (+ f z x)   
-  
-  
-  
-  *)
