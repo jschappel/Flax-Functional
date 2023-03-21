@@ -64,7 +64,8 @@ let rec alpha_convert_exp env exp =
   | CoreSetExp (v, e) -> CoreSetExp (get_alpha_var v, alpha_convert_exp env e)
   | CoreFreeVarExp _ ->
       failwith "Unreachable. This is introduced during FreeVar transformation"
-  | CorePhase2ClosureExp _ | CorePhase2RefExp _ ->
+  | CorePhase2MakeClosureExp _ | CorePhase2EnvRefExp _ | CorePhase2LambdaExp _
+  | CorePhase2MakeEnvExp _ ->
       failwith "Unreachable. This is introduced during Phase2."
 
 let alpha_convert_def global_env (CoreDef (var, exp)) =

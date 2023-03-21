@@ -21,22 +21,19 @@ type core_exp =
   | CoreFreeVarExp of string * int
   (* Below is introduced during closure conversion *)
   (* TODO: Removed below?*)
-  | CorePhase2RefExp of {
-      env_ref : string;
-      id : identifier;
+  | CorePhase2EnvRefExp of {
+      env : core_exp;
+      var : string;
     }
-  | CorePhase2ClosureExp of {
+  | CorePhase2MakeEnvExp of (identifier * core_exp) list
+  | CorePhase2MakeClosureExp of {
+      lambda : core_exp;
+      env : core_exp;
+    }
+  | CorePhase2LambdaExp of {
       params : string list;
       body : core_exp;
-      ref_id : string; (*HACK: What is this for? Should this just be another param*)
-      env : closure_env_exp list;
     }
-
-and closure_env_exp = identifier * closure_env
-
-and closure_env =
-  | EnvRef of string * string
-  | EnvVar of identifier
 
 (** A variable is an identifier represented as a string *)
 and identifier = string [@@deriving show, eq]

@@ -6,6 +6,7 @@ module Grammar = Flax_grammar
 module Environment = Flax_environment.Env
 module AlphaConverter = AlphaConverter
 module FreevarTransformer = FreevarTransformer
+module ClosureConverter = ClosureConverter
 
 module Build = struct
   let run_prog prog =

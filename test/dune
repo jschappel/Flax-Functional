@@ -10,6 +10,7 @@
   cpsTest
   generatorTest
   alphaConverterTest
+  closureConverterTest
   freevarTransformerTest)
  (action
   (run %{test}))
