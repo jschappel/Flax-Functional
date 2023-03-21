@@ -17,10 +17,9 @@ type core_exp =
   | CoreListExp of core_exp list
   | CoreSetExp of string * core_exp
   | CoreBeginExp of core_exp list
-  (* Below are introduced during free var transformation *)
+  (* NOTE: Below are introduced during free var transformation *)
   | CoreFreeVarExp of string * int
-  (* Below is introduced during closure conversion *)
-  (* TODO: Removed below?*)
+  (* NOTE: Below is introduced during closure conversion *)
   | CorePhase2EnvRefExp of {
       env : core_exp;
       var : string;

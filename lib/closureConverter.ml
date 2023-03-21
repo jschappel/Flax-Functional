@@ -6,7 +6,7 @@ type core_phase2_prog = core_prog
 let prim_env = PrimEnvironment.new_env ()
 
 module EnvNameSymGen = Utils.Generator.SymGen (struct
-  let s = "env$"
+  let s = "__env__"
 end)
 
 (* https://matt.might.net/articles/closure-conversion/
